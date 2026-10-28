@@ -78,7 +78,13 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .sq .tint{position:absolute;inset:0;opacity:.5}
 .sq .tint.to{opacity:.62}
 .sq .chk{position:absolute;inset:0;background:radial-gradient(circle,rgba(250,65,45,.95) 0%,rgba(250,65,45,.45) 42%,transparent 70%)}
-.sq svg.pc{position:absolute;inset:3%;width:94%;height:94%;filter:drop-shadow(0 .3cqw .2cqw rgba(0,0,0,.3))}
+.sq .pc{position:absolute;inset:3%;width:94%;height:94%;filter:drop-shadow(0 .3cqw .2cqw rgba(0,0,0,.3));will-change:transform}
+.sq piece.pc{inset:0;width:100%;height:100%}
+piece{display:block;background-size:cover;background-repeat:no-repeat;background-position:center}
+piece.mini{display:inline-block}
+.gk{width:24px;height:24px;flex:none;display:inline-block}
+.badge{animation:pop .22s .16s both cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
 .co{position:absolute;font-family:var(--f-ui);font-size:2.6cqw;font-weight:800;line-height:1}
 .co.r{top:3.5%;left:4%}.co.f{bottom:3%;right:4.5%}
 .sq.l .co{color:var(--sq-d)}.sq.d .co{color:var(--sq-l)}
@@ -117,7 +123,7 @@ h2{font-family:var(--f-head);font-size:16px;font-weight:800;margin:0 0 12px}
 .pl{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
 .pl .ava{width:52px;height:52px;border-radius:6px;display:grid;place-items:center}
 .pl .ava.w{background:#E8E6E1}.pl .ava.b{background:#4A4643}
-.pl .ava svg{width:42px;height:42px}
+.pl .ava > *{width:42px;height:42px}
 .pl b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .pl span{font-size:12px;color:var(--muted)}
 .vs{font-size:12px;color:var(--muted);font-weight:800}
@@ -245,7 +251,7 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
       <h2>Все ходы</h2>
       <div class="moves" id="moves"></div>
     </div>
-    <p class="foot">Разбирай только завершённые партии: подсказки движка во время игры считаются нечестной игрой. Анализ делает Stockfish прямо в браузере, поэтому оценки близки к chess.com, но не совпадают один в один.</p>
+    <p class="foot">Разбирай только завершённые партии: подсказки движка во время игры считаются нечестной игрой. Анализ делает Stockfish прямо в браузере, поэтому оценки близки к chess.com, но не совпадают один в один. Классические фигуры: Colin M.L. Burnett, лицензия CC BY-SA 3.0.</p>
   </section>
 </div>
 
@@ -284,6 +290,11 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
         <option value="18">Максимум · 18</option>
       </select>
     </div>
+    <div class="row"><label for="pieces">Фигуры</label>
+      <select id="pieces"><option value="cb">Классические</option><option value="own">Плоские</option></select>
+    </div>
+    <label class="row hint" style="gap:8px"><input type="checkbox" id="sound" checked style="width:18px;height:18px"> Звук ходов</label>
+    <p class="hint" id="piecenote" hidden>Классические фигуры не загрузились, показываю плоские. Внутри Claude внешние стили закрыты, на GitHub Pages они работают.</p>
     <button class="go" id="go">Найти партии</button>
     <div id="loadmsg" class="msg" hidden></div>
     <div id="games" class="games"></div>
@@ -324,7 +335,12 @@ const ORDER = ["brilliant","great","best","excellent","good","inaccuracy","mista
 const NOTABLE = ["brilliant","great","inaccuracy","mistake","miss","blunder"];
 const cvar = k => `var(--c-${k})`;
 const PC = {w:"--pf:#FAFAF7;--ps:#2A2724;--pd:#2A2724", b:"--pf:#4A4642;--ps:#1E1C1A;--pd:#C9C5BE"};
-const pieceSvg = (color,type,cls) => `<svg class="${cls||""}" viewBox="0 0 45 45" style="${PC[color]}"><use href="#p${type}"/></svg>`;
+let SET="own";
+const PNAME={p:"pawn",n:"knight",b:"bishop",r:"rook",q:"queen",k:"king"};
+const pieceSvg = (color,type,cls) => SET==="cb"
+  ? `<piece class="${PNAME[type]} ${color==="w"?"white":"black"} ${cls||""}"></piece>`
+  : `<svg class="${cls||""}" viewBox="0 0 45 45" style="${PC[color]}"><use href="#p${type}"/></svg>`;
+const CB_CSS="https://cdn.jsdelivr.net/npm/chessground@9.0.4/assets/chessground.cburnett.css";
 
 const S = {fens:[],moves:[],an:[],cls:[],acc:[],idx:0,flip:false,depth:12,headers:{},gen:0,done:false,showBest:true,preview:false};
 
@@ -537,7 +553,7 @@ function renderGames(list,nick){
     const res=me.result==="win"?["Победа","var(--c-best)"]:draw?["Ничья","var(--muted)"]:["Поражение","var(--c-blunder)"];
     const d=g.end_time?new Date(g.end_time*1000).toLocaleDateString("ru-RU",{day:"numeric",month:"short"}):"";
     const b=document.createElement("button");
-    b.innerHTML=`<span style="display:flex;gap:10px;align-items:center;min-width:0">${pieceSvg(meW?"w":"b","k","").replace("<svg ","<svg width=\"22\" height=\"22\" ")}<span style="min-width:0"><b>${esc(op.username)}</b> <span class="meta">${op.rating||""}</span><br><span class="meta">${esc(TC[g.time_class]||g.time_class||"")} · ${d}</span></span></span><span class="res" style="color:${res[1]}">${res[0]}</span>`;
+    b.innerHTML=`<span style="display:flex;gap:10px;align-items:center;min-width:0">${pieceSvg(meW?"w":"b","k","gk")}<span style="min-width:0"><b>${esc(op.username)}</b> <span class="meta">${op.rating||""}</span><br><span class="meta">${esc(TC[g.time_class]||g.time_class||"")} · ${d}</span></span></span><span class="res" style="color:${res[1]}">${res[0]}</span>`;
     b.onclick=()=>{ if(g.pgn){ $("pgn").value=g.pgn; if(loadPgn(g.pgn)){ closeSheet(); window.scrollTo({top:0,behavior:"smooth"}); } } };
     box.appendChild(b);
   }
@@ -581,7 +597,11 @@ function view(){
   if(S.showBest&&last&&lc&&!["best","brilliant","great"].includes(lc)){ const a=S.an[S.idx-1]; if(a&&a.best) arrow=a.best; }
   return {fen:S.fens[S.idx],last,cls:lc,arrow,ev:S.an[S.idx],preview:false};
 }
-function renderBoard(v){
+let boardKey="";
+function renderBoard(v,anim){
+  const key=[v.fen,v.last&&v.last.from+v.last.to,v.cls,v.arrow,S.flip,SET].join("|");
+  if(key===boardKey&&!anim) return;
+  boardKey=key;
   const c=new Chess(v.fen||undefined), bd=c.board();
   let checkSq=null;
   if(c.in_check()) for(let r=0;r<8;r++)for(let f=0;f<8;f++){const p=bd[r][f]; if(p&&p.type==="k"&&p.color===c.turn()) checkSq=sqName(f,8-r);}
@@ -597,10 +617,50 @@ function renderBoard(v){
     if(dr===7) inner+=`<span class="co f">${"abcdefgh"[file]}</span>`;
     if(p) inner+=pieceSvg(p.color,p.type,"pc");
     if(v.last&&sq===v.last.to&&v.cls) inner+=`<span class="badge" style="background:${cvar(v.cls)}">${CLS[v.cls].sym}</span>`;
-    html+=`<div class="sq ${(file+rank)%2?"l":"d"}${dr===0?" edge-top":""}${dc===7?" edge-right":""}">${inner}</div>`;
+    html+=`<div class="sq ${(file+rank)%2?"l":"d"}${dr===0?" edge-top":""}${dc===7?" edge-right":""}" data-sq="${sq}">${inner}</div>`;
   }
   $("grid").innerHTML=html;
   $("arrows").innerHTML=v.arrow?arrowSvg(v.arrow.slice(0,2),v.arrow.slice(2,4)):"";
+  if(anim) animate(anim);
+}
+const RM=matchMedia("(prefers-reduced-motion: reduce)");
+function animate(list){
+  if(RM.matches) return;
+  const board=$("board"), sz=board.clientWidth/8;
+  for(const [from,to] of list){
+    const el=board.querySelector(`[data-sq="${to}"]`); if(!el) continue;
+    const pc=el.querySelector(".pc"); if(!pc) continue;
+    const [fx,fy]=sqXY(from),[tx2,ty2]=sqXY(to);
+    el.style.zIndex=6;
+    pc.style.transition="none";
+    pc.style.transform=`translate(${(fx-tx2)*sz}px,${(fy-ty2)*sz}px)`;
+    pc.getBoundingClientRect();
+    pc.style.transition="transform .2s cubic-bezier(.25,.8,.35,1)";
+    pc.style.transform="";
+    setTimeout(()=>{ el.style.zIndex=""; },260);
+  }
+}
+function animFor(m,reverse){
+  const list=[[m.from,m.to]], r=m.color==="w"?"1":"8";
+  if(m.flags.includes("k")) list.push(["h"+r,"f"+r]);
+  if(m.flags.includes("q")) list.push(["a"+r,"d"+r]);
+  return reverse?list.map(([a,b])=>[b,a]):list;
+}
+/* move sounds, synthesized so nothing is loaded */
+let AC=null, SOUND=true;
+function snd(kind){
+  if(!SOUND) return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime, len=kind==="cap"?.09:.06;
+    const buf=AC.createBuffer(1,Math.floor(AC.sampleRate*len),AC.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++){ const e=Math.pow(1-i/d.length,kind==="cap"?3:4); d[i]=(Math.random()*2-1)*e; }
+    const src=AC.createBufferSource(); src.buffer=buf;
+    const f=AC.createBiquadFilter(); f.type="bandpass"; f.frequency.value=kind==="cap"?1400:900; f.Q.value=kind==="cap"?2:3;
+    const g=AC.createGain(); g.gain.setValueAtTime(kind==="chk"?1.4:1.1,t);
+    src.connect(f).connect(g).connect(AC.destination); src.start(t);
+    if(kind==="chk"){ const o=AC.createOscillator(), og=AC.createGain(); o.frequency.value=880; og.gain.setValueAtTime(.08,t+.05); og.gain.exponentialRampToValueAtTime(.0001,t+.25); o.connect(og).connect(AC.destination); o.start(t+.05); o.stop(t+.26); }
+  }catch(e){}
 }
 function arrowSvg(from,to){
   const [x1,y1]=sqXY(from),[x2,y2]=sqXY(to);
@@ -709,11 +769,20 @@ function renderButtons(){
   $("act-best").setAttribute("aria-pressed",S.preview);
   $("act-show").setAttribute("aria-pressed",S.showBest);
 }
-function render(){
+function render(anim){
   const v=view();
-  renderBoard(v); renderEval(v); renderCoach(v); renderStrip(); renderSummary(); renderGraph(); renderMoves(); renderButtons();
+  renderBoard(v,anim); renderEval(v); renderCoach(v); renderStrip(); renderSummary(); renderGraph(); renderMoves(); renderButtons();
 }
-function go(i){ const n=Math.max(0,Math.min(S.fens.length-1,i)); S.preview=false; if(n===S.idx){render();return;} S.idx=n; render(); }
+function go(i){
+  const n=Math.max(0,Math.min(S.fens.length-1,i)), was=S.preview, prev=S.idx;
+  S.preview=false;
+  if(n===prev){ render(); return; }
+  let anim=null, m=null;
+  if(!was&&n===prev+1){ m=S.moves[prev]; anim=animFor(m,false); }
+  else if(!was&&n===prev-1){ m=S.moves[n]; anim=animFor(m,true); }
+  S.idx=n; render(anim);
+  if(m) snd(m.san.includes("+")||m.san.includes("#")?"chk":m.captured?"cap":"move");
+}
 
 /* ---------- events ---------- */
 $("prev").onclick=()=>go(S.idx-1);
@@ -762,11 +831,37 @@ $("go").onclick=()=>{
 let rz; window.addEventListener("resize",()=>{clearTimeout(rz); rz=setTimeout(()=>{renderGraph();renderStrip();},120);});
 try{ const n=localStorage.getItem("revizor-nick"); if(n) $("nick").value=n; }catch(e){}
 
+function loadClassic(){
+  return new Promise(res=>{
+    let done=false; const fin=v=>{ if(!done){done=true;res(v);} };
+    const l=document.createElement("link"); l.rel="stylesheet"; l.href=CB_CSS;
+    l.onload=()=>{ const t=document.createElement("div"); t.className="cg-wrap"; t.style.cssText="position:absolute;left:-9999px;top:0";
+      t.innerHTML='<piece class="pawn white" style="width:10px;height:10px"></piece>'; document.body.appendChild(t);
+      const ok=/url\(/.test(getComputedStyle(t.firstChild).backgroundImage); t.remove(); fin(ok); };
+    l.onerror=()=>fin(false);
+    document.head.appendChild(l);
+    setTimeout(()=>fin(false),8000);
+  });
+}
+let classicOk=null;
+async function setPieces(want){
+  if(want==="cb"){
+    if(classicOk===null) classicOk=await loadClassic();
+    if(!classicOk){ SET="own"; $("pieces").value="own"; $("piecenote").hidden=false; render(); return; }
+  }
+  SET=want; boardKey=""; render();
+}
+$("pieces").onchange=e=>{ try{localStorage.setItem("revizor-pieces",e.target.value);}catch(_){}; setPieces(e.target.value); };
+$("sound").onchange=e=>{ SOUND=e.target.checked; try{localStorage.setItem("revizor-sound",SOUND?"1":"0");}catch(_){}; };
+document.body.classList.add("cg-wrap");
+
 /* ---------- boot ---------- */
 if(typeof Chess==="undefined"){ setStatus("Не загрузилась шахматная библиотека. Проверь интернет и обнови страницу.",0); return; }
 engineReady=engine.init(); engineReady.catch(()=>{});
 setTab("link");
 loadPgn(SAMPLE);
+let wantSet="cb"; try{ wantSet=localStorage.getItem("revizor-pieces")||"cb"; if(localStorage.getItem("revizor-sound")==="0"){SOUND=false;$("sound").checked=false;} }catch(_){}
+$("pieces").value=wantSet; setPieces(wantSet);
 })();
 </script>
 </body>
