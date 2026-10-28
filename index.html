@@ -18,7 +18,7 @@
   --sq-l:#EBECD0; --sq-d:#739552;
   --bubble:#FFFFFF; --bubble-ink:#312E2B;
   --c-brilliant:#26C2A3; --c-great:#749BBF; --c-best:#81B64C; --c-excellent:#96BC4B; --c-good:#96AF8B;
-  --c-inaccuracy:#F7C045; --c-mistake:#FFA459; --c-miss:#FF7769; --c-blunder:#FA412D;
+  --c-book:#A88764; --c-inaccuracy:#F7C045; --c-mistake:#FFA459; --c-miss:#FF7769; --c-blunder:#FA412D;
   --f-head:"Montserrat","Nunito Sans",system-ui,sans-serif;
   --f-ui:"Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --gut:max(12px,env(safe-area-inset-left,0px));
@@ -127,6 +127,9 @@ h2{font-family:var(--f-head);font-size:16px;font-weight:800;margin:0 0 12px}
 .pl .ava > *{width:42px;height:42px}
 .pl b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .pl span{font-size:12px;color:var(--muted)}
+.opening{margin:-4px 0 14px;text-align:center;color:var(--ink-2);font-weight:700;font-size:14px;display:flex;gap:7px;align-items:center;justify-content:center}
+.opening .chip{width:22px;height:22px}
+.opening .chip svg{width:13px;height:13px}
 .vs{font-size:12px;color:var(--muted);font-weight:800}
 .accs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:16px}
 .accv{border-radius:7px;padding:9px 6px;text-align:center;font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
@@ -195,6 +198,7 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
     <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.6l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.8l-5.8 3.3 1.4-6.4-4.9-4.4 6.5-.7z"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-up" viewBox="0 0 24 24"><path fill="currentColor" d="M7 10h3l3.2-6.2c1.6 0 2.6 1.1 2.3 2.8L15 10h4.2c1.3 0 2.2 1.2 1.9 2.4l-1.6 6.4c-.3 1.1-1.2 1.7-2.3 1.7H7zM3 10h3v10.5H3z"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path fill="currentColor" d="M2.5 5.6c2.7-1.2 5.9-1.1 8.7.6v13.4c-2.8-1.6-6-1.7-8.7-.6zM12.8 6.2c2.8-1.7 6-1.8 8.7-.6v13.4c-2.7-1.1-5.9-1-8.7.6z"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
   </defs>
 </svg>
@@ -246,6 +250,7 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
     <div class="card" id="sumcard">
       <h2>Итоги партии</h2>
       <div class="players" id="players"></div>
+      <p class="opening" id="opening" hidden></p>
       <div class="accs" id="accs"></div>
       <div class="summary" id="summary"></div>
     </div>
@@ -325,19 +330,20 @@ const SAMPLE = `[Event "Paris"]
 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0`;
 
 const VAL = {p:1,n:3,b:3,r:5,q:9,k:0};
-const ICON = {star:'<svg viewBox="0 0 24 24"><use href="#i-star"/></svg>', check:'<svg viewBox="0 0 24 24"><use href="#i-check"/></svg>', up:'<svg viewBox="0 0 24 24"><use href="#i-up"/></svg>', x:'<svg viewBox="0 0 24 24"><use href="#i-x"/></svg>'};
+const ICON = {star:'<svg viewBox="0 0 24 24"><use href="#i-star"/></svg>', check:'<svg viewBox="0 0 24 24"><use href="#i-check"/></svg>', up:'<svg viewBox="0 0 24 24"><use href="#i-up"/></svg>', x:'<svg viewBox="0 0 24 24"><use href="#i-x"/></svg>', book:'<svg viewBox="0 0 24 24"><use href="#i-book"/></svg>'};
 const CLS = {
   brilliant:{sym:"!!",name:"Блестяще",head:"блестящий ход"},
   great:{sym:"!",name:"Сильный ход",head:"сильный ход"},
   best:{sym:ICON.star,name:"Лучший",head:"лучший ход"},
   excellent:{sym:ICON.up,name:"Отлично",head:"отличный ход"},
   good:{sym:ICON.check,name:"Хорошо",head:"хороший ход"},
+  book:{sym:ICON.book,name:"Теория",head:"теоретический ход"},
   inaccuracy:{sym:"?!",name:"Неточность",head:"неточность"},
   mistake:{sym:"?",name:"Ошибка",head:"ошибка"},
   miss:{sym:ICON.x,name:"Упущение",head:"упущенный шанс"},
   blunder:{sym:"??",name:"Зевок",head:"зевок"}
 };
-const ORDER = ["brilliant","great","best","excellent","good","inaccuracy","mistake","miss","blunder"];
+const ORDER = ["brilliant","great","best","excellent","good","book","inaccuracy","mistake","miss","blunder"];
 const NOTABLE = ["brilliant","great","inaccuracy","mistake","miss","blunder"];
 const cvar = k => `var(--c-${k})`;
 const PC = {w:"--pf:#FAFAF7;--ps:#2A2724;--pd:#2A2724", b:"--pf:#4A4642;--ps:#1E1C1A;--pd:#C9C5BE"};
@@ -348,7 +354,73 @@ const pieceSvg = (color,type,cls) => SET==="cb"
   : `<svg class="${cls||""}" viewBox="0 0 45 45" style="${PC[color]}"><use href="#p${type}"/></svg>`;
 const CB_CSS="https://cdn.jsdelivr.net/npm/chessground@9.0.4/assets/chessground.cburnett.css";
 
-const S = {fens:[],moves:[],an:[],cls:[],acc:[],idx:0,flip:false,depth:12,headers:{},gen:0,done:false,showBest:true,preview:false};
+const S = {fens:[],moves:[],an:[],cls:[],acc:[],idx:0,flip:false,depth:12,headers:{},gen:0,done:false,showBest:true,preview:false,bookPlies:0,opening:""};
+/* ---------- opening book ---------- */
+const BOOK_RU=[
+["Королевский пешечный дебют","e4"],["Ферзевый пешечный дебют","d4"],["Английское начало","c4"],["Дебют Рети","Nf3"],["Дебют Берда","f4"],["Дебют Ларсена","b3"],
+["Открытая игра","e4 e5"],["Дебют королевского коня","e4 e5 Nf3"],["Защита Филидора","e4 e5 Nf3 d6"],["Русская партия (защита Петрова)","e4 e5 Nf3 Nf6"],
+["Итальянская партия","e4 e5 Nf3 Nc6 Bc4"],["Джуоко пиано","e4 e5 Nf3 Nc6 Bc4 Bc5"],["Джуоко пиано, пианиссимо","e4 e5 Nf3 Nc6 Bc4 Bc5 d3"],
+["Итальянская партия, главная линия","e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6"],["Гамбит Эванса","e4 e5 Nf3 Nc6 Bc4 Bc5 b4"],
+["Защита двух коней","e4 e5 Nf3 Nc6 Bc4 Nf6"],["Защита двух коней, вариант с Ng5","e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5"],["Защита двух коней, атака Фегателло","e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7"],
+["Защита двух коней, современный вариант","e4 e5 Nf3 Nc6 Bc4 Nf6 d3"],["Венгерская защита","e4 e5 Nf3 Nc6 Bc4 Be7"],
+["Испанская партия","e4 e5 Nf3 Nc6 Bb5"],["Испанская партия, вариант Морфи","e4 e5 Nf3 Nc6 Bb5 a6"],["Испанская партия, разменный вариант","e4 e5 Nf3 Nc6 Bb5 a6 Bxc6"],
+["Испанская партия, закрытый вариант","e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7"],["Испанская партия, открытый вариант","e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Nxe4"],
+["Испанская партия, берлинская защита","e4 e5 Nf3 Nc6 Bb5 Nf6"],["Шотландская партия","e4 e5 Nf3 Nc6 d4"],["Шотландская партия, основной вариант","e4 e5 Nf3 Nc6 d4 exd4 Nxd4"],
+["Шотландский гамбит","e4 e5 Nf3 Nc6 d4 exd4 Bc4"],["Дебют трёх коней","e4 e5 Nf3 Nc6 Nc3"],["Дебют четырёх коней","e4 e5 Nf3 Nc6 Nc3 Nf6"],["Дебют Понциани","e4 e5 Nf3 Nc6 c3"],
+["Венская партия","e4 e5 Nc3"],["Королевский гамбит","e4 e5 f4"],["Принятый королевский гамбит","e4 e5 f4 exf4"],["Дебют слона","e4 e5 Bc4"],["Центральный дебют","e4 e5 d4 exd4"],
+["Защита Алехина","e4 Nf6"],["Скандинавская защита","e4 d5"],["Скандинавская защита, основной вариант","e4 d5 exd5 Qxd5"],["Скандинавская защита, современный вариант","e4 d5 exd5 Nf6"],
+["Сицилианская защита","e4 c5"],["Сицилианская защита","e4 c5 Nf3 d6"],["Сицилианская защита","e4 c5 Nf3 Nc6"],["Сицилианская защита","e4 c5 Nf3 e6"],
+["Сицилианская защита, открытый вариант","e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3"],["Сицилианская защита, вариант Найдорфа","e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6"],
+["Сицилианская защита, вариант дракона","e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6"],["Сицилианская защита, классический вариант","e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 Nc6"],
+["Сицилианская защита, схевенингенский вариант","e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 e6"],["Сицилианская защита, вариант Свешникова","e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5"],
+["Сицилианская защита, вариант Россолимо","e4 c5 Nf3 Nc6 Bb5"],["Сицилианская защита, закрытый вариант","e4 c5 Nc3"],["Сицилианская защита, атака Гран-при","e4 c5 Nc3 Nc6 f4"],
+["Сицилианская защита, вариант Алапина","e4 c5 c3"],["Сицилианская защита, гамбит Морра","e4 c5 d4 cxd4 c3"],
+["Французская защита","e4 e6"],["Французская защита","e4 e6 d4 d5"],["Французская защита, разменный вариант","e4 e6 d4 d5 exd5 exd5"],["Французская защита, вариант продвижения","e4 e6 d4 d5 e5"],
+["Французская защита, вариант Тарраша","e4 e6 d4 d5 Nd2"],["Французская защита, вариант Винавера","e4 e6 d4 d5 Nc3 Bb4"],["Французская защита, классический вариант","e4 e6 d4 d5 Nc3 Nf6"],
+["Защита Каро-Канн","e4 c6"],["Защита Каро-Канн","e4 c6 d4 d5"],["Защита Каро-Канн, вариант продвижения","e4 c6 d4 d5 e5"],["Защита Каро-Канн, классический вариант","e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5"],
+["Защита Каро-Канн, разменный вариант","e4 c6 d4 d5 exd5 cxd5"],["Защита Каро-Канн, атака Панова","e4 c6 d4 d5 exd5 cxd5 c4"],
+["Защита Пирца-Уфимцева","e4 d6"],["Защита Пирца-Уфимцева","e4 d6 d4 Nf6 Nc3 g6"],["Современная защита","e4 g6"],["Защита Нимцовича","e4 Nc6"],
+["Закрытые дебюты","d4 d5"],["Ферзевый гамбит","d4 d5 c4"],["Принятый ферзевый гамбит","d4 d5 c4 dxc4"],["Отказанный ферзевый гамбит","d4 d5 c4 e6"],["Отказанный ферзевый гамбит","d4 d5 c4 e6 Nc3 Nf6"],
+["Славянская защита","d4 d5 c4 c6"],["Полуславянская защита","d4 d5 c4 c6 Nf3 Nf6 Nc3 e6"],["Защита Чигорина","d4 d5 c4 Nc6"],["Контргамбит Альбина","d4 d5 c4 e5"],
+["Лондонская система","d4 d5 Bf4"],["Лондонская система","d4 Nf6 Bf4"],["Лондонская система","d4 d5 Nf3 Nf6 Bf4"],["Система Колле","d4 d5 Nf3 Nf6 e3"],
+["Индийская защита","d4 Nf6"],["Индийская защита","d4 Nf6 c4"],["Староиндийская защита","d4 Nf6 c4 g6 Nc3 Bg7"],["Староиндийская защита, классический вариант","d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5"],
+["Защита Грюнфельда","d4 Nf6 c4 g6 Nc3 d5"],["Защита Нимцовича","d4 Nf6 c4 e6 Nc3 Bb4"],["Новоиндийская защита","d4 Nf6 c4 e6 Nf3 b6"],["Каталонское начало","d4 Nf6 c4 e6 g3"],
+["Защита Бенони","d4 Nf6 c4 c5"],["Гамбит Волжский (Бенко)","d4 Nf6 c4 c5 d5 b5"],["Будапештский гамбит","d4 Nf6 c4 e5"],["Атака Тромповского","d4 Nf6 Bg5"],["Голландская защита","d4 f5"],
+["Английское начало, симметричный вариант","c4 c5"],["Английское начало, обратная сицилианская","c4 e5"],["Английское начало","c4 Nf6"],["Дебют Рети","Nf3 d5"],["Дебют Рети","Nf3 Nf6"]
+];
+const BOOK={pref:new Set(),ru:new Map(),en:new Map()};
+const sanKey=s=>s.replace(/[+#!?]/g,"");
+function addLine(map,name,sans){ for(let i=1;i<=sans.length;i++) BOOK.pref.add(sans.slice(0,i).join(" ")); map.set(sans.join(" "),name); }
+BOOK_RU.forEach(([n,l])=>addLine(BOOK.ru,n,l.split(" ")));
+function computeBook(){
+  const sans=S.moves.map(m=>sanKey(m.san));
+  let n=0;
+  if(S.fens[0]&&S.fens[0].startsWith("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w"))
+    while(n<sans.length&&BOOK.pref.has(sans.slice(0,n+1).join(" "))) n++;
+  let ru="",lr=0,en="",le=0;
+  for(let i=1;i<=n;i++){ const key=sans.slice(0,i).join(" "); if(BOOK.ru.has(key)){ru=BOOK.ru.get(key);lr=i;} if(BOOK.en.has(key)){en=BOOK.en.get(key);le=i;} }
+  let name = le>lr+1 ? en : (ru||en);
+  if(!name&&S.headers.ECOUrl){ try{ name=decodeURIComponent(S.headers.ECOUrl.split("/").pop()).replace(/-/g," "); }catch(e){} }
+  S.opening=name||"";
+  const old=S.bookPlies||0; S.bookPlies=n;
+  for(let k=0;k<Math.max(n,old);k++){
+    if(k<n){ S.cls[k]="book"; delete S.acc[k]; }
+    else if(S.cls[k]==="book"){ delete S.cls[k]; classify(k); }
+  }
+}
+async function loadLichessBook(){
+  try{
+    const parts=await Promise.all("abcde".split("").map(x=>fetch(`https://cdn.jsdelivr.net/gh/lichess-org/chess-openings@master/${x}.tsv`).then(r=>r.ok?r.text():"").catch(()=>"")));
+    let cnt=0;
+    for(const t of parts) for(const line of t.split("\n").slice(1)){
+      const [eco,name,pgn]=line.split("\t"); if(!pgn) continue;
+      const sans=pgn.replace(/\d+\.(\.\.)?/g," ").trim().split(/\s+/).map(sanKey).filter(Boolean);
+      if(sans.length){ addLine(BOOK.en,name,sans); cnt++; }
+    }
+    if(cnt&&S.moves.length){ computeBook(); boardKey=""; render(); }
+  }catch(e){}
+}
+
 
 /* ---------- math ---------- */
 const winp = cp => 50 + 50*(2/(1+Math.exp(-0.00368208*cp)) - 1);
@@ -442,6 +514,7 @@ function isSacrifice(k){
   return !after.moves({verbose:true}).some(x=>x.to===m.to);
 }
 function classify(k){
+  if(k<S.bookPlies){ S.cls[k]="book"; delete S.acc[k]; return; }
   const a=S.an[k], b=S.an[k+1]; if(!a||!b) return;
   const m=S.moves[k], white=m.color==="w";
   const pov = ww => white?ww:100-ww;
@@ -490,7 +563,8 @@ function loadPgn(text){
   const g=new Chess(headers.FEN||undefined);
   const fens=[g.fen()], moves=[];
   for(const h of hist){ moves.push(g.move({from:h.from,to:h.to,promotion:h.promotion})); fens.push(g.fen()); }
-  Object.assign(S,{fens,moves,an:[],cls:[],acc:[],headers,idx:0,done:false,preview:false});
+  Object.assign(S,{fens,moves,an:[],cls:[],acc:[],headers,idx:0,done:false,preview:false,bookPlies:0,opening:""});
+  computeBook();
   const nick=($("nick").value||"").trim().toLowerCase();
   S.flip = !!nick && (headers.Black||"").toLowerCase()===nick;
   render(); startAnalysis();
@@ -701,7 +775,8 @@ function renderCoach(v){
   const m=S.moves[k], c=S.cls[k], a=S.an[k], b=S.an[k+1];
   if(!c){ box.innerHTML=`<div class="bhead"><span class="ico" style="background:#8B8986">…</span><span class="t">${sanHtml(m.san,m.color)}</span></div><p class="btext">Движок ещё думает над этим ходом.</p>`; return; }
   let t;
-  if(c==="best") t = m.san.includes("#")?"Шах и мат, и игра закончена.":m.captured?`Правильно, надо забирать ${ACC_NAME[m.captured]}.`:"Это лучший ход в позиции.";
+  if(c==="book") t = S.opening?`Это ход из теории дебюта: ${esc(S.opening)}.`:"Это ход из теории дебютов.";
+  else if(c==="best") t = m.san.includes("#")?"Шах и мат, и игра закончена.":m.captured?`Правильно, надо забирать ${ACC_NAME[m.captured]}.`:"Это лучший ход в позиции.";
   else if(c==="brilliant") t="Блестящая жертва! И движок с ней согласен.";
   else if(c==="great") t="Единственный ход, который держит позицию. Остальное заметно хуже.";
   else if(c==="excellent") t="Почти так же сильно, как лучший ход. "+(a.best?hint(S.fens[k],a.best):"");
@@ -731,6 +806,7 @@ function renderSummary(){
   const h=S.headers;
   const pl=(c)=>`<div class="pl"><div class="ava ${c}">${pieceSvg(c,"k","")}</div><b>${esc((c==="w"?h.White:h.Black)||(c==="w"?"Белые":"Чёрные"))}</b><span>${esc((c==="w"?h.WhiteElo:h.BlackElo)||"")}</span></div>`;
   $("players").innerHTML=pl("w")+`<span class="vs">${esc(h.Result&&h.Result!=="*"?h.Result:"vs")}</span>`+pl("b");
+  const op=$("opening"); op.hidden=!S.opening; op.innerHTML=S.opening?`<span class="chip" style="background:var(--c-book)">${ICON.book}</span>${esc(S.opening)}`:"";
   $("accs").innerHTML=`<div class="accv w">${avgAcc("w")}</div><span class="k">Точность</span><div class="accv b">${avgAcc("b")}</div>`;
   let s="";
   for(const c of ORDER){
@@ -878,6 +954,7 @@ setTab("link");
 loadPgn(SAMPLE);
 let wantSet="cb"; try{ wantSet=localStorage.getItem("revizor-pieces")||"cb"; if(localStorage.getItem("revizor-sound")==="0"){SOUND=false;$("sound").checked=false;} }catch(_){}
 $("pieces").value=wantSet; setPieces(wantSet);
+loadLichessBook();
 })();
 </script>
 </body>
