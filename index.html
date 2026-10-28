@@ -94,8 +94,9 @@ piece.mini{display:inline-block}
 .arrows{position:absolute;inset:0;pointer-events:none;z-index:3}
 
 /* move strip */
-.mstrip{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;margin-top:18px;height:52px}
+.mstrip{display:grid;grid-template-columns:1fr 44px 44px;gap:2px;align-items:center;margin-top:18px;height:52px}
 .mstrip .ibtn svg{width:30px;height:30px}
+.mstrip .ibtn{background:var(--bar)}
 .strip{display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;white-space:nowrap;font-weight:800;font-size:19px;padding:4px 0;scroll-behavior:smooth;mask-image:linear-gradient(90deg,transparent,#000 16px,#000 calc(100% - 16px),transparent)}
 .strip::-webkit-scrollbar{display:none}
 .strip .n{color:var(--muted);font-weight:700;padding:0 2px 0 12px}
@@ -231,8 +232,9 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
   </div>
 
   <div class="mstrip">
-    <button class="ibtn" id="prev" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+
     <nav class="strip" id="strip" aria-label="Ходы партии"></nav>
+    <button class="ibtn" id="prev" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
     <button class="ibtn" id="next2" aria-label="Вперёд"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
   </div>
 
