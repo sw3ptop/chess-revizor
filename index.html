@@ -221,6 +221,9 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
 @keyframes sk{from{background-position:200% 0}to{background-position:0 0}}
 .empty{text-align:center;color:var(--muted);font-weight:700;font-size:14px;padding:22px 10px}
 .empty b{display:block;color:#fff;font-size:16px;margin-bottom:4px}
+.prep{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--green-d);color:#fff;text-decoration:none;border-radius:12px;padding:12px 14px}
+.prep span{display:flex;flex-direction:column}.prep b{font-size:15px}.prep small{font-size:12.5px;font-weight:700;opacity:.85}
+.prep svg{width:22px;height:22px;flex:none}
 .bylink{background:var(--bg-2);border-radius:12px;padding:12px 14px}
 .bylink summary{cursor:pointer;font-weight:800;font-size:14px;color:var(--ink-2)}
 .bylink[open] summary{margin-bottom:10px}
@@ -355,6 +358,7 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
       <p class="hint">Ник нужен любого из двух игроков: chess.com ищет партии только по нику.</p>
     </details>
     <textarea id="pgn" hidden aria-hidden="true"></textarea>
+    <a class="prep" href="https://sw3ptop.github.io/chess-revizor/trainer.html" target="_blank" rel="noopener"><span><b>Подготовка к сопернику</b><small>Задачи из его зевков, его дебюты и досье</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></a>
   </div>
 </section>
 <section class="sheet" id="settings" aria-label="Настройки" aria-hidden="true">
