@@ -67,6 +67,14 @@ button{cursor:pointer;border:0;background:none;padding:0}
 .bhead .t .san{white-space:nowrap}
 .bhead .ev{flex:none;background:#3C3936;color:#fff;font-weight:800;font-size:15px;border-radius:7px;padding:4px 10px;font-variant-numeric:tabular-nums}
 .btext{margin:8px 0 0;font-size:16px;font-weight:600;line-height:1.35;position:relative}
+.lseq{display:flex;flex-wrap:wrap;gap:2px 3px;margin-top:9px;font-weight:800;font-size:15px;align-items:center}
+.lseq .ln{color:#8B8986;font-weight:700;margin-left:4px}
+.lseq .lm{padding:3px 6px;border-radius:6px;color:#312E2B;font-weight:800}
+.lseq .lm.on{background:var(--c-best);color:#fff}
+.lctl{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.lbtn{background:var(--c-best);color:#fff;font-weight:800;font-size:14px;border-radius:9px;padding:8px 13px;box-shadow:0 3px 0 var(--green-d)}
+.lbtn.ghost{background:#EDEBE8;color:#312E2B;box-shadow:0 3px 0 #C9C6C1}
+.lbtn:active{transform:translateY(2px);box-shadow:none}
 .mini{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.16em;margin-right:1px}
 
 /* board */
@@ -745,10 +753,12 @@ function hint(fen,uci){
 const sqName=(f,r)=>"abcdefgh"[f]+r;
 function sqXY(sq){ const f="abcdefgh".indexOf(sq[0]), r=+sq[1]; return S.flip?[7-f+.5,r-1+.5]:[f+.5,8-r+.5]; }
 function view(){
-  // what the board currently shows: played position, or the engine's better move in preview mode
-  if(S.preview && S.idx>0){
-    const a=S.an[S.idx-1];
-    if(a&&a.best){ const r=playUci(S.fens[S.idx-1],a.best); if(r) return {fen:r.fen,last:r.m,cls:"best",arrow:null,ev:a,preview:true}; }
+  // what the board shows: the played position, or a step of the engine's best line
+  if(S.line){
+    const L=S.line;
+    if(L.step===0) return {fen:S.fens[L.base],last:L.base>0?S.moves[L.base-1]:null,cls:null,arrow:L.moves[0].m.from+L.moves[0].m.to,ev:S.an[L.base],line:true};
+    const st=L.moves[L.step-1];
+    return {fen:st.fen,last:st.m,cls:L.step===1?"best":null,arrow:null,ev:S.an[L.base],line:true};
   }
   const last=S.idx>0?S.moves[S.idx-1]:null, lc=last?S.cls[S.idx-1]:null;
   let arrow=null;
@@ -805,21 +815,52 @@ function animFor(m,reverse){
   return reverse?list.map(([a,b])=>[b,a]):list;
 }
 /* move sounds, synthesized so nothing is loaded */
-let AC=null, SOUND=true;
+let AC=null, SOUND=true, unlocked=false;
+function audio(){
+  if(!AC){ AC=new (window.AudioContext||window.webkitAudioContext)(); try{ if(navigator.audioSession) navigator.audioSession.type="playback"; }catch(e){} }
+  if(AC.state==="suspended") AC.resume();
+  return AC;
+}
+function unlockAudio(){
+  if(unlocked) return; unlocked=true;
+  try{
+    const ac=audio();
+    const b=ac.createBuffer(1,1,22050), src=ac.createBufferSource(); src.buffer=b; src.connect(ac.destination); src.start(0);
+    // a silent <audio> tag moves iOS into the media channel, so sound plays even with the ring switch on silent
+    const el=document.createElement("audio");
+    el.src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+    el.setAttribute("playsinline",""); el.play().catch(()=>{});
+  }catch(e){}
+}
+["touchstart","pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,unlockAudio,{passive:true}));
+function knock(ac,t,freq,gain,decay){
+  const len=Math.floor(ac.sampleRate*decay*1.6);
+  const buf=ac.createBuffer(1,len,ac.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(ac.sampleRate*decay*.18));
+  const src=ac.createBufferSource(); src.buffer=buf;
+  const bp=ac.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=freq; bp.Q.value=6;
+  const g=ac.createGain(); g.gain.value=gain;
+  src.connect(bp).connect(g).connect(ac.destination); src.start(t);
+  const o=ac.createOscillator(), og=ac.createGain(); o.type="sine"; o.frequency.setValueAtTime(freq*.42,t); o.frequency.exponentialRampToValueAtTime(freq*.3,t+decay);
+  og.gain.setValueAtTime(gain*.5,t); og.gain.exponentialRampToValueAtTime(.0001,t+decay);
+  o.connect(og).connect(ac.destination); o.start(t); o.stop(t+decay+.02);
+}
+function tone(ac,t,f,peak,dur,type){
+  const o=ac.createOscillator(), g=ac.createGain(); o.type=type||"sine"; o.frequency.value=f;
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(peak,t+.015); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(ac.destination); o.start(t); o.stop(t+dur+.02);
+}
 function snd(kind){
   if(!SOUND) return;
   try{
-    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
-    const t=AC.currentTime, len=kind==="cap"?.09:.06;
-    const buf=AC.createBuffer(1,Math.floor(AC.sampleRate*len),AC.sampleRate), d=buf.getChannelData(0);
-    for(let i=0;i<d.length;i++){ const e=Math.pow(1-i/d.length,kind==="cap"?3:4); d[i]=(Math.random()*2-1)*e; }
-    const src=AC.createBufferSource(); src.buffer=buf;
-    const f=AC.createBiquadFilter(); f.type="bandpass"; f.frequency.value=kind==="cap"?1400:900; f.Q.value=kind==="cap"?2:3;
-    const g=AC.createGain(); g.gain.setValueAtTime(kind==="chk"?1.4:1.1,t);
-    src.connect(f).connect(g).connect(AC.destination); src.start(t);
-    if(kind==="chk"){ const o=AC.createOscillator(), og=AC.createGain(); o.frequency.value=880; og.gain.setValueAtTime(.08,t+.05); og.gain.exponentialRampToValueAtTime(.0001,t+.25); o.connect(og).connect(AC.destination); o.start(t+.05); o.stop(t+.26); }
+    const ac=audio(), t=ac.currentTime+.01;
+    if(kind==="cap"){ knock(ac,t,1250,2.2,.07); knock(ac,t+.05,900,1.6,.08); }
+    else if(kind==="chk"){ knock(ac,t,1050,2,.08); tone(ac,t+.04,1320,.18,.3,"triangle"); }
+    else if(kind==="best"){ [784,988,1319].forEach((f,i)=>tone(ac,t+i*.07,f,.16,.28)); }
+    else knock(ac,t,880,2.4,.07);
   }catch(e){}
 }
+function sndFor(m){ snd(m.san.includes("+")||m.san.includes("#")?"chk":m.captured?"cap":"move"); }
 function arrowSvg(from,to){
   const [x1,y1]=sqXY(from),[x2,y2]=sqXY(to);
   const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy),ux=dx/len,uy=dy/len,nx=-uy,ny=ux;
@@ -834,22 +875,73 @@ function renderEval(v){
   lbl.textContent=a?a.disp:"0.00";
   lbl.classList.toggle("dark", ww<9);
 }
+function renderLineCoach(box,evp){
+  const L=S.line, a=S.an[L.base];
+  const f=S.fens[L.base].split(" "); let num=+f[5], turn=f[1];
+  let seq="";
+  L.moves.forEach((st,i)=>{
+    if(turn==="w"||i===0) seq+=`<span class="ln">${num}${turn==="w"?".":"…"}</span>`;
+    seq+=`<button class="lm${L.step===i+1?" on":""}" data-s="${i+1}">${sanHtml(st.m.san,st.m.color)}</button>`;
+    if(turn==="b") num++; turn=turn==="w"?"b":"w";
+  });
+  const first=L.moves[0].m;
+  const title=L.step<=1?`${sanHtml(first.san,first.color)} — лучший ход`:`Лучшая линия · ход ${L.step} из ${L.moves.length}`;
+  box.innerHTML=`<div class="bhead"><span class="ico" style="background:var(--c-best)">${ICON.star}</span><span class="t">${title}</span>${evp(a)}</div>
+    <div class="lseq">${seq}</div>
+    <div class="lctl"><button class="lbtn" id="l-replay">${L.playing?"Пауза":"Проиграть заново"}</button><button class="lbtn ghost" id="l-exit">Вернуться к партии</button></div>`;
+  $("l-replay").onclick=()=>{ if(S.line.playing){ stopLine(); render(); } else playLine(true); };
+  $("l-exit").onclick=exitLine;
+  box.querySelectorAll(".lm").forEach(b=>b.onclick=()=>{ stopLine(); lineTo(+b.dataset.s); });
+}
+let lineTimer=null;
+function startLine(){
+  const base=S.idx>0?S.idx-1:0, a=S.an[base];
+  if(!a||!a.pv||!a.pv.length){ setStatus("Движок ещё не посчитал эту позицию, подожди пару секунд",0); return; }
+  const c=new Chess(S.fens[base]), moves=[];
+  for(const u of a.pv.slice(0,10)){ const m=c.move({from:u.slice(0,2),to:u.slice(2,4),promotion:u[4]||"q"}); if(!m) break; moves.push({m,fen:c.fen()}); }
+  if(!moves.length) return;
+  S.line={base,moves,step:0,playing:false};
+  boardKey="";
+  playLine(false);
+}
+function lineTo(n){
+  const L=S.line; if(!L) return;
+  n=Math.max(0,Math.min(L.moves.length,n));
+  if(n===L.step) return;
+  let a=null, m=null;
+  if(n===L.step+1){ m=L.moves[n-1].m; a=animFor(m,false); }
+  else if(n===L.step-1){ m=L.moves[L.step-1].m; a=animFor(m,true); }
+  const fwd=n>L.step;
+  L.step=n; render(a);
+  if(m){ if(fwd&&n===1) snd("best"); else sndFor(m); }
+}
+function playLine(restart){
+  const L=S.line; if(!L) return;
+  clearTimeout(lineTimer); L.playing=true;
+  if(restart||L.step>=L.moves.length){ L.step=0; boardKey=""; }
+  render();
+  const tick=()=>{
+    const Q=S.line; if(!Q||!Q.playing) return;
+    if(Q.step>=Q.moves.length){ Q.playing=false; render(); return; }
+    lineTo(Q.step+1);
+    lineTimer=setTimeout(tick,Q.step===1?1400:1000);
+  };
+  lineTimer=setTimeout(tick,500);
+}
+function stopLine(){ clearTimeout(lineTimer); if(S.line) S.line.playing=false; }
+function exitLine(){ stopLine(); S.line=null; boardKey=""; render(); }
 function renderCoach(v){
   const box=$("bubble");
   const evp=a=>a?`<span class="ev">${esc(a.disp)}</span>`:"";
+  if(v.line){ renderLineCoach(box,evp); return; }
   if(S.idx===0){
     const a=S.an[0];
-    const t=a&&a.best?`Движок начал бы с ${(()=>{const r=playUci(S.fens[0],a.best);return r?sanHtml(r.m.san,r.m.color):""})()}. Жми «Далее», и разберём каждый ход.`:"Жми «Далее», и разберём каждый ход.";
+    const t=a&&a.best?`Движок начал бы с ${(()=>{const r=playUci(S.fens[0],a.best);return r?sanHtml(r.m.san,r.m.color):""})()}. Листай стрелками внизу, а «Лучший» покажет, как играть сильнее.`:"Листай стрелками внизу, и разберём каждый ход.";
     box.innerHTML=`<div class="bhead"><span class="ico" style="background:var(--green)">${ICON.star}</span><span class="t">Начинаем разбор</span>${evp(a)}</div><p class="btext">${t}</p>`;
     return;
   }
   const k=S.idx-1;
-  if(v.preview){
-    const a=S.an[k], r=playUci(S.fens[k],a.best);
-    const pv=pvToSan(S.fens[k],a.pv,6);
-    box.innerHTML=`<div class="bhead"><span class="ico" style="background:var(--c-best)">${ICON.star}</span><span class="t">${sanHtml(r.m.san,r.m.color)} — лучший ход</span>${evp(a)}</div><p class="btext">Так было бы сильнее всего. Дальше по движку: ${esc(pv)}</p>`;
-    return;
-  }
+  if(v.line){ renderLineCoach(box,evp); return; }
   const m=S.moves[k], c=S.cls[k], a=S.an[k], b=S.an[k+1];
   if(!c){ box.innerHTML=`<div class="bhead"><span class="ico" style="background:#8B8986">…</span><span class="t">${sanHtml(m.san,m.color)}</span></div><p class="btext">Движок ещё думает над этим ходом.</p>`; return; }
   let t;
@@ -963,7 +1055,8 @@ function renderMoves(){
 function renderButtons(){
   $("prev").disabled=S.idx<=0;
   $("next").disabled=S.idx>=S.fens.length-1;
-  $("act-best").setAttribute("aria-pressed",S.preview);
+  $("act-best").setAttribute("aria-pressed",!!S.line);
+  if(S.line){ $("prev").disabled=false; $("next").disabled=S.line.step>=S.line.moves.length; }
   $("act-show").setAttribute("aria-pressed",S.showBest);
 }
 function render(anim){
@@ -971,6 +1064,7 @@ function render(anim){
   renderBoard(v,anim); renderEval(v); renderCoach(v); renderStrip(); renderSummary(); renderGraph(); renderMoves(); renderButtons();
 }
 function go(i){
+  if(S.line){ stopLine(); S.line=null; boardKey=""; }
   const n=Math.max(0,Math.min(S.fens.length-1,i)), was=S.preview, prev=S.idx;
   S.preview=false;
   if(n===prev){ render(); return; }
@@ -978,16 +1072,16 @@ function go(i){
   if(!was&&n===prev+1){ m=S.moves[prev]; anim=animFor(m,false); }
   else if(!was&&n===prev-1){ m=S.moves[n]; anim=animFor(m,true); }
   S.idx=n; render(anim);
-  if(m) snd(m.san.includes("+")||m.san.includes("#")?"chk":m.captured?"cap":"move");
+  if(m) sndFor(m);
 }
 
 /* ---------- events ---------- */
-$("prev").onclick=()=>go(S.idx-1);
-$("next").onclick=()=>go(S.idx+1);
+$("prev").onclick=()=>{ if(S.line){ stopLine(); if(S.line.step===0) exitLine(); else lineTo(S.line.step-1); } else go(S.idx-1); };
+$("next").onclick=()=>{ if(S.line){ stopLine(); lineTo(S.line.step+1); } else go(S.idx+1); };
 $("flip").onclick=()=>{S.flip=!S.flip;render();};
 $("act-sum").onclick=()=>{ const r=$("sumcard").getBoundingClientRect(); window.scrollTo({top:r.top+scrollY-12,behavior:"smooth"}); };
 $("act-show").onclick=()=>{S.showBest=!S.showBest; render();};
-$("act-best").onclick=()=>{ if(S.idx===0) return; S.preview=!S.preview; render(); };
+$("act-best").onclick=()=>{ if(S.line) exitLine(); else startLine(); };
 $("strip").addEventListener("click",e=>{const b=e.target.closest("[data-i]"); if(b) go(+b.dataset.i);});
 $("summary").addEventListener("click",e=>{
   const b=e.target.closest("button[data-c]"); if(!b||b.disabled) return;
