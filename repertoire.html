@@ -460,11 +460,11 @@ function auto(){
   if(C.i>=l.san.length){ finish(); return; }
   if(B.chess.turn()!==l.side){
     B.locked=true;
-    const m=playMove(l.san[C.i]); C.i++; lineBox();
+    const m=playMove(l.san[C.i],l.fen?null:{badge:{color:"#A88764",sym:BOOK}}); C.i++; lineBox();
     let n=l.notes[C.i-1];
     if(!C.revealed&&REP.filter(x=>x.side===l.side&&x.san.slice(0,C.i).join(" ")===l.san.slice(0,C.i).join(" ")).length===1){
-      C.revealed=true; renderList(); bubble("var(--blue)","!",`Он: ${sanHtml(m.san,m.color)} · ${esc(l.title)}`,"",(n?n+" ":"")+`Это ветка «${esc(l.title)}».`);
-    } else bubble("var(--blue)","!",`Он: ${sanHtml(m.san,m.color)}`,"",n||"Твой ход.");
+      C.revealed=true; renderList(); bubble("#A88764",BOOK,`Он: ${sanHtml(m.san,m.color)} · ${esc(l.title)}`,"",(n?n+" ":"")+`Это ветка «${esc(l.title)}».`);
+    } else bubble("#A88764",BOOK,`Он: ${sanHtml(m.san,m.color)}`,"теория",n||"Твой ход.");
     setTimeout(autoFor(MODE.cur),n?900:550);
   } else {
     B.locked=false;
@@ -477,11 +477,11 @@ function userMove(uci,from,to){
   if(C.l.alt&&C.i===0){ const t=new Chess(B.chess.fen()).move({from,to,promotion:"q"}); if(t&&C.l.alt.includes(t.san)) e=t; }
   if(e&&e.from===from&&e.to===to){
     B.locked=true;
-    const m=playMove({from,to,promotion:"q"},{badge:{color:"var(--green)",sym:CHECK}});
+    const m=playMove({from,to,promotion:"q"},{badge:C.l.fen?{color:"var(--green)",sym:CHECK}:{color:"#A88764",sym:BOOK}});
     C.i++; lineBox();
     let n=C.l.notes[C.i-1];
     if(C.l.alt&&C.l.alt.length>1) n=(m.san!==C.l.san[0]?`Подходит. Движок чуть больше любит ${C.l.san[0]}. `:"")+(n||"");
-    bubble("var(--green)",CHECK,`${sanHtml(m.san,m.color)} — верно`,`${C.i}/${C.l.san.length}`,n||"Так и играем.");
+    bubble(C.l.fen?"var(--green)":"#A88764",C.l.fen?CHECK:BOOK,`${sanHtml(m.san,m.color)} — ${C.l.fen?"верно":"теория"}`,`${C.i}/${C.l.san.length}`,n||"Так и играем.");
     setTimeout(autoFor(MODE.cur),n?1300:600);
   } else {
     C.mistakes++;
