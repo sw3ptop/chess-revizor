@@ -26,7 +26,8 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+html,body{touch-action:manipulation}
+html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg-2);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.4;
   padding-left:var(--gut);padding-right:var(--gut-r);padding-block:0 calc(96px + env(safe-area-inset-bottom,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg-2)}
@@ -1110,8 +1111,8 @@ let tx=null,ty=null;
 $("board").addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
 $("board").addEventListener("touchend",e=>{ if(tx==null) return; const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty; tx=null;
   if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.3) go(S.idx+(dx<0?1:-1)); });
-let lastTouch=0;
-document.addEventListener("touchend",e=>{ const now=Date.now(); const t=e.target.closest("button,.board"); if(t&&now-lastTouch<350){ e.preventDefault(); if(t.tagName==="BUTTON") t.click(); } lastTouch=now; },{passive:false});
+let lastT=0; document.addEventListener("touchend",e=>{ if(e.target.closest("input,select,textarea,label,summary")) return; const n=Date.now(); if(n-lastT<350){ e.preventDefault(); const t=e.target.closest("button,a"); if(t) t.click(); } lastT=n; },{passive:false});
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 document.addEventListener("gesturestart",e=>e.preventDefault());
 
 $("open").onclick=()=>{ openSheet("sheet"); if($("nick").value.trim()&&!GAMES.length) lookup(); else if(!GAMES.length) $("games").innerHTML=`<div class="empty"><b>Найди свои партии</b>Введи ник на chess.com, и здесь появятся последние партии. Нажми на любую, чтобы разобрать.</div>`; };

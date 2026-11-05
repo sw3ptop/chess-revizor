@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#262421">
 <style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
-<title>Мой репертуар</title>
+<title>Мои дебюты</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Nunito+Sans:opsz,wght@6..12,600;6..12,700;6..12,800&display=swap">
@@ -23,7 +23,8 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+html,body{touch-action:manipulation}
+html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg-2);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.4;
   padding-left:var(--gut);padding-right:var(--gut-r);padding-block:0 calc(92px + env(safe-area-inset-bottom,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg-2)}
@@ -164,9 +165,9 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .foot{font-size:12.5px;color:var(--muted);margin:14px 2px 0}
 
 /* drills list */
-.drills{display:flex;gap:8px;margin:0 calc(-1*var(--gut-r)) 12px 0;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;padding-right:var(--gut-r)}
+.drills-old{display:flex;gap:8px;margin:0 calc(-1*var(--gut-r)) 12px 0;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;padding-right:var(--gut-r)}
 .drills::-webkit-scrollbar{display:none}
-.dr{flex:none;width:min(250px,72vw);scroll-snap-align:start;display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;gap:4px 10px;align-items:center;background:var(--bg);border-radius:13px;padding:11px 12px;text-align:left}
+.dr-old{flex:none;width:min(250px,72vw);scroll-snap-align:start;display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;gap:4px 10px;align-items:center;background:var(--bg);border-radius:13px;padding:11px 12px;text-align:left}
 .dr .st{grid-column:2}
 .dr[aria-current="true"]{box-shadow:inset 0 0 0 2px var(--green)}
 .dr .t{font-weight:800;font-size:14.5px;min-width:0}
@@ -186,6 +187,17 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .switch:checked{background:var(--green)}
 #v-sheet .card{margin-bottom:12px}
+.opening{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.opening .sw2{width:38px;height:38px;border-radius:10px}.opening .sw2 > *{width:32px;height:32px}
+.opening b{font-family:var(--f-head);font-size:17px;display:block}.opening small{color:var(--muted);font-weight:700;font-size:13px}
+.branches{margin-top:16px}
+.branches .bh{display:flex;justify-content:space-between;align-items:baseline}
+.branches .bh span{color:var(--muted);font-weight:800;font-size:13px}
+.brl{display:flex;flex-direction:column;gap:6px}
+.br{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;background:var(--bg-2);border-radius:11px;padding:10px 12px;text-align:left}
+.br[aria-current="true"]{box-shadow:inset 0 0 0 2px var(--green)}
+.br b{font-size:14.5px}.br small{grid-column:1;color:var(--muted);font-weight:700;font-size:12.5px;font-family:var(--f-ui)}
+.br .stars{grid-row:1/3;grid-column:2}
 </style>
 </head>
 <body>
@@ -209,17 +221,17 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 <div class="app">
   <header class="top">
     <div class="hdr">
-      <h1>Мой репертуар <span class="vs">против sitLP</span></h1>
+      <h1>Мои дебюты <span class="vs">против sitLP</span></h1>
       <div class="score"><b id="solvedN">0</b><br><span id="solvedOf"></span></div>
     </div>
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" id="t-b" aria-selected="true">Чёрными <span class="cnt" id="c-b"></span></button>
-      <button class="tab" role="tab" id="t-w" aria-selected="false">Белыми <span class="cnt" id="c-w"></span></button>
+      <button class="tab" role="tab" id="t-b" aria-selected="true">1...e5 <span class="cnt" id="c-b"></span></button>
+      <button class="tab" role="tab" id="t-w" aria-selected="false">Лондон <span class="cnt" id="c-w"></span></button>
       <button class="tab" role="tab" id="t-s" aria-selected="false">Шпаргалка</button>
     </div>
   </header>
   <section id="v-play">
-    <div class="drills" id="drills"></div>
+    <div class="opening" id="openHead"></div>
     <label class="opt" for="arrowsT"><span>Стрелки на новых вариантах</span><input type="checkbox" id="arrowsT" class="switch" checked></label>
     <div class="coach">
       <div class="bot" aria-hidden="true">
@@ -240,6 +252,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
     <div class="bleed"><div class="board" id="board"><div class="grid" id="grid"></div><svg class="arrows" id="arrows" viewBox="0 0 8 8"></svg></div></div>
     <div class="turn"><span class="who"><span class="sw" id="turnSw"></span><span id="turnTxt"></span></span><span id="ctx"></span></div>
     <div class="line" id="lineBox"></div>
+    <div class="card branches"><div class="bh"><h2 id="brTitle">Его варианты</h2><span id="brCnt"></span></div><div class="brl" id="drills"></div></div>
   </section>
   <section id="v-sheet" hidden><div id="sheet"></div></section>
 </div>
@@ -389,24 +402,31 @@ function totals(){
   $("c-w").textContent=linesOf("w").filter(l=>stars(l.id)>=3).length+"/"+linesOf("w").length;
 }
 function bubble(c,ico,title,tag,text){ $("bubble").innerHTML=`<div class="bhead"><span class="ico" style="background:${c}">${ico}</span><span class="bt">${title}</span>${tag?`<span class="tag">${esc(tag)}</span>`:""}</div><p class="btext">${text}</p>`; }
+const OPEN={b:{name:"1...e5 — открытая игра",sub:"Ты чёрными. На 1.e4 всегда 1...e5 и 2...Nc6"},w:{name:"Лондонская система",sub:"Ты белыми. 1.d4, 2.Bf4, e3, Nf3, c3, Nbd2"}};
+const branchMove=l=>{ const k=l.san.findIndex((s,i)=>(i%2===0?"w":"b")!==l.side&&REP.filter(x=>x.side===l.side&&x.san.slice(0,i+1).join(" ")===l.san.slice(0,i+1).join(" ")).length===1); return k<0?"":((k%2===0?(k/2+1)+".":(Math.floor(k/2)+1)+"...")+l.san[k]); };
 function renderList(){
-  const L=linesOf(MODE.tab);
-  $("drills").innerHTML=L.map(l=>`<button class="dr" data-d="${l.id}" aria-current="${MODE.cur&&MODE.cur.l.id===l.id}"><span class="sw2 ${l.side}">${pieceSvg(l.side,"k","")}</span><span class="t">${esc(l.title)}<small>${esc(l.sub)}</small></span><span class="st"><span class="pill ${l.tc}">${esc(l.tag)}</span> <span class="stars${stars(l.id)>=3?" done":""}">${STARS(stars(l.id))}</span></span></button>`).join("");
-  const cur=$("drills").querySelector('[aria-current="true"]'); if(cur) $("drills").scrollLeft=cur.offsetLeft-$("drills").offsetLeft-4;
+  const L=linesOf(MODE.tab), side=MODE.tab;
+  $("openHead").innerHTML=`<span class="sw2 ${side}">${pieceSvg(side,"k","")}</span><span><b>${OPEN[side].name}</b><small>${OPEN[side].sub}</small></span>`;
+  $("brCnt").textContent=`выучено ${L.filter(l=>stars(l.id)>=3).length} из ${L.length}`;
+  const known=MODE.cur&&MODE.cur.revealed;
+  $("drills").innerHTML=L.map(l=>`<button class="br" data-d="${l.id}" aria-current="${!!(known&&MODE.cur.l.id===l.id)}"><b>${esc(l.title)}</b><span class="stars${stars(l.id)>=3?" done":""}">${STARS(stars(l.id))}</span><small>${esc(branchMove(l))} · ${esc(l.sub)}</small></button>`).join("");
 }
-$("drills").addEventListener("click",e=>{ const b=e.target.closest("[data-d]"); if(!b) return; startLine(REP.find(l=>l.id===b.dataset.d)); });
+$("drills").addEventListener("click",e=>{ const b=e.target.closest("[data-d]"); if(!b) return; startLine(REP.find(l=>l.id===b.dataset.d),true); window.scrollTo({top:0,behavior:"smooth"}); });
 function pickNext(){
   const L=linesOf(MODE.tab).slice();
   const curId=MODE.cur&&MODE.cur.l.id;
-  L.sort((a,b)=>stars(a.id)-stars(b.id)||(((SAVE[a.id]||{}).t||0)-((SAVE[b.id]||{}).t||0)));
-  return L.find(l=>l.id!==curId)||L[0];
+  // random branch, weak ones much more often; never the same twice in a row
+  const pool=L.filter(l=>l.id!==curId); const src=pool.length?pool:L;
+  const wts=src.map(l=>[8,4,2,1][stars(l.id)]); let r=Math.random()*wts.reduce((a,b)=>a+b,0);
+  for(let i=0;i<src.length;i++){ r-=wts[i]; if(r<=0) return src[i]; } return src[0];
 }
-function startLine(l){
-  MODE.cur={l,i:0,mistakes:0,hinted:false,done:false};
+function startLine(l,explicit){
+  MODE.cur={l,i:0,mistakes:0,hinted:false,done:false,revealed:!!explicit};
   B.chess=new Chess(); B.flip=l.side==="b"; B.sel=null; B.marks={}; B.arrow=null; B.badge=null; B.last=null; B.locked=true;
   B.onMove=userMove; $("lineBox").innerHTML="";
   const learn=stars(l.id)===0&&ARROWS;
-  bubble("var(--green)",BOOK,esc(l.title),l.side==="w"?"ты белыми":"ты чёрными",`${esc(l.sub)}. ${learn?"Первый раз: зелёная стрелка покажет нужный ход, просто повторяй.":"Сыграй вариант по памяти. Три чистых прохода, и он выучен."}`);
+  if(explicit) bubble("var(--green)",BOOK,esc(l.title),l.side==="w"?"ты белыми":"ты чёрными",`${esc(l.sub)}. ${learn?"Первый раз: зелёная стрелка покажет нужный ход, просто повторяй.":"Сыграй вариант по памяти. Три чистых прохода, и он выучен."}`);
+  else bubble("var(--green)",BOOK,"Новая партия",l.side==="w"?"ты белыми":"ты чёрными",`Он сыграет один из своих вариантов, какой — узнаешь по ходу. Отвечай по системе.${learn?" Новый вариант — подскажу стрелкой.":""}`);
   $("ctx").innerHTML=`<span class="stars${stars(l.id)>=3?" done":""}">${STARS(stars(l.id))}</span>`;
   setMain("show"); renderList(); render();
   setTimeout(auto,650);
@@ -422,7 +442,10 @@ function auto(){
   if(B.chess.turn()!==l.side){
     B.locked=true;
     const m=playMove(l.san[C.i]); C.i++; lineBox();
-    const n=l.notes[C.i-1]; bubble("var(--blue)","!",`Он: ${sanHtml(m.san,m.color)}`,"",n||"Твой ход.");
+    let n=l.notes[C.i-1];
+    if(!C.revealed&&REP.filter(x=>x.side===l.side&&x.san.slice(0,C.i).join(" ")===l.san.slice(0,C.i).join(" ")).length===1){
+      C.revealed=true; renderList(); bubble("var(--blue)","!",`Он: ${sanHtml(m.san,m.color)} · ${esc(l.title)}`,"",(n?n+" ":"")+`Это ветка «${esc(l.title)}».`);
+    } else bubble("var(--blue)","!",`Он: ${sanHtml(m.san,m.color)}`,"",n||"Твой ход.");
     setTimeout(auto,n?900:550);
   } else {
     B.locked=false;
@@ -463,7 +486,7 @@ function finish(){
   const clean=C.mistakes===0&&!C.hinted, learnRun=stars(id)===0&&ARROWS;
   const s0=stars(id); let s=s0;
   if(clean) s=Math.min(3,s0+1); else if(C.mistakes>=2) s=Math.max(0,s0-1);
-  SAVE[id]={s,t:Date.now()}; persist(); totals(); renderList();
+  SAVE[id]={s,t:Date.now()}; persist(); C.revealed=true; totals(); renderList();
   $("ctx").innerHTML=`<span class="stars${s>=3?" done":""}">${STARS(s)}</span>`;
   snd(clean?"win":"move");
   let msg;
@@ -523,7 +546,7 @@ function renderSheet(){
   </div>
   <p class="foot">Все ходы проверены движком Stockfish. Звёзды показывают, сколько раз ты прошёл вариант без ошибок, и хранятся в этом браузере. Фигуры: Colin M.L. Burnett, CC BY-SA 3.0.</p>`;
 }
-$("sheet").addEventListener("click",e=>{ const b=e.target.closest("[data-j]"); if(!b) return; const l=REP.find(x=>x.id===b.dataset.j); switchTab(l.side); startLine(l); });
+$("sheet").addEventListener("click",e=>{ const b=e.target.closest("[data-j]"); if(!b) return; const l=REP.find(x=>x.id===b.dataset.j); switchTab(l.side); startLine(l,true); });
 
 /* ---------- tabs ---------- */
 function switchTab(t){
@@ -539,7 +562,8 @@ $("b-retry").onclick=()=>MODE.cur&&startLine(MODE.cur.l);
 $("b-main").onclick=()=>{ const k=$("b-main").dataset.k; if(k==="show") reveal(); else if(k==="again") startLine(MODE.cur.l); else startLine(pickNext()); };
 $("arrowsT").checked=ARROWS;
 $("arrowsT").onchange=e=>{ ARROWS=e.target.checked; try{ localStorage.setItem("my-rep-arrows",ARROWS?"1":"0"); }catch(_){} if(MODE.cur&&!MODE.cur.done) startLine(MODE.cur.l); };
-let lastT=0; document.addEventListener("touchend",e=>{ const n=Date.now(); const t=e.target.closest("button"); if(t&&n-lastT<350){ e.preventDefault(); t.click(); } lastT=n; },{passive:false});
+let lastT=0; document.addEventListener("touchend",e=>{ if(e.target.closest("input,select,textarea,label")) return; const n=Date.now(); if(n-lastT<350){ e.preventDefault(); const t=e.target.closest("button,a"); if(t) t.click(); } lastT=n; },{passive:false});
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 document.addEventListener("gesturestart",e=>e.preventDefault());
 
 /* ---------- boot ---------- */

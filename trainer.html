@@ -22,7 +22,8 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+html,body{touch-action:manipulation}
+html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg-2);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.4;
   padding-left:var(--gut);padding-right:var(--gut-r);padding-block:0 calc(92px + env(safe-area-inset-bottom,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg-2)}
@@ -665,7 +666,8 @@ $("b-main").onclick=()=>{
   if(MODE.tab==="puz"){ if(k==="next") nextPuzzle(); else revealPuzzle(); }
   else { if(k==="nextline"){ MODE.drill++; loadDrill(); } else if(k==="again") loadDrill(); else drillReveal(); }
 };
-let lastT=0; document.addEventListener("touchend",e=>{ const n=Date.now(); const t=e.target.closest("button"); if(t&&n-lastT<350){ e.preventDefault(); t.click(); } lastT=n; },{passive:false});
+let lastT=0; document.addEventListener("touchend",e=>{ if(e.target.closest("input,select,textarea,label,summary")) return; const n=Date.now(); if(n-lastT<350){ e.preventDefault(); const t=e.target.closest("button,a"); if(t) t.click(); } lastT=n; },{passive:false});
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 document.addEventListener("gesturestart",e=>e.preventDefault());
 
 /* ================= SCOUT: download games, analyse, build trainer data ================= */
