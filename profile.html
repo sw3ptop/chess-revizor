@@ -132,11 +132,14 @@ a{color:inherit}
 .sitenav a[aria-current="page"]{background:#81B64C;color:#fff;box-shadow:0 2px 0 #45753C}
 .sitenav a:not([aria-current]):active{background:#4A4744}
 @media (max-width:340px){.sitenav a svg{display:none}}
+.pinbar{position:sticky;top:0;z-index:45;background:#262421;margin-left:calc(-1*var(--gut));margin-right:calc(-1*var(--gut-r));padding-left:var(--gut);padding-right:var(--gut-r);padding-top:env(safe-area-inset-top,0px);margin-top:calc(-1*env(safe-area-inset-top,0px))}
+.pinbar .sitenav{position:static;box-shadow:none}
 </style>
 </head>
 <body>
 
 <div class="app">
+  <div class="pinbar">
   <nav class="sitenav" aria-label="Разделы"><a href="https://sw3ptop.github.io/chess-revizor/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Разбор</a><a href="https://sw3ptop.github.io/chess-revizor/repertoire.html"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 5.6c2.7-1.2 5.9-1.1 8.7.6v13.4c-2.8-1.6-6-1.7-8.7-.6zM12.8 6.2c2.8-1.7 6-1.8 8.7-.6v13.4c-2.7-1.1-5.9-1-8.7.6z"/></svg>Дебюты</a><a href="https://sw3ptop.github.io/chess-revizor/profile.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Профиль</a></nav>
   <header class="top">
     <div class="hdr">
@@ -144,6 +147,7 @@ a{color:inherit}
       <div><h1 id="pName">Профиль</h1><small id="pSub">Загружаю…</small></div>
     </div>
   </header>
+  </div>
 
   <section class="card">
     <div class="hero">

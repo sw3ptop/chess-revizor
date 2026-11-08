@@ -35,7 +35,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 @media (min-width:640px){.bleed{margin-left:0;margin-right:0}}
 
 /* header + tabs */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg-2);padding-top:8px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg-2);padding-top:8px;margin-left:calc(-1*var(--gut));margin-right:calc(-1*var(--gut-r));padding-left:var(--gut);padding-right:var(--gut-r);}
 .hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px}
 .hdr h1{margin:0;font-family:var(--f-head);font-weight:800;font-size:21px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 .hdr h1 .vs{font-size:12px;font-family:var(--f-ui);font-weight:800;background:var(--bar);color:var(--ink-2);border-radius:6px;padding:3px 8px}
@@ -207,6 +207,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .sitenav a[aria-current="page"]{background:#81B64C;color:#fff;box-shadow:0 2px 0 #45753C}
 .sitenav a:not([aria-current]):active{background:#4A4744}
 @media (max-width:340px){.sitenav a svg{display:none}}
+.toast:not(.show){visibility:hidden}
 </style>
 </head>
 <body>
