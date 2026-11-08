@@ -201,12 +201,12 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translate(-50%,-150%);z-index:50;background:#fff;color:#312E2B;font-weight:800;font-size:14px;border-radius:12px;padding:10px 16px;box-shadow:0 6px 20px rgba(0,0,0,.4);transition:transform .3s cubic-bezier(.3,1.3,.5,1);max-width:calc(100% - 32px);text-align:center}
 .toast.show{transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-.sitenav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#3A3835;border-radius:12px;padding:4px;margin:10px 0 6px}
+.sitenav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:#3A3835;border-radius:12px;padding:4px;margin:10px 0 6px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:45;box-shadow:0 6px 0 6px #262421}
 .sitenav a{display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:9px;text-decoration:none;color:#DAD8D5;font-family:"Nunito Sans",system-ui,-apple-system,sans-serif;font-weight:800;font-size:13.5px;white-space:nowrap}
 .sitenav a svg{width:16px;height:16px;flex:none}
 .sitenav a[aria-current="page"]{background:#81B64C;color:#fff;box-shadow:0 2px 0 #45753C}
 .sitenav a:not([aria-current]):active{background:#4A4744}
-@media (max-width:460px){.sitenav a svg{display:none}.sitenav a{font-size:13px}}
+@media (max-width:340px){.sitenav a svg{display:none}}
 </style>
 </head>
 <body>
@@ -230,7 +230,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 
 <div class="app">
   <header class="top">
-    <nav class="sitenav" aria-label="Разделы"><a href="https://sw3ptop.github.io/chess-revizor/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Разбор</a><a href="https://sw3ptop.github.io/chess-revizor/repertoire.html"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 5.6c2.7-1.2 5.9-1.1 8.7.6v13.4c-2.8-1.6-6-1.7-8.7-.6zM12.8 6.2c2.8-1.7 6-1.8 8.7-.6v13.4c-2.7-1.1-5.9-1-8.7.6z"/></svg>Дебюты</a><a href="https://sw3ptop.github.io/chess-revizor/profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Профиль</a><a href="https://sw3ptop.github.io/chess-revizor/trainer.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>Соперник</a></nav>
+    <nav class="sitenav" aria-label="Разделы"><a href="https://sw3ptop.github.io/chess-revizor/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Разбор</a><a href="https://sw3ptop.github.io/chess-revizor/repertoire.html"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 5.6c2.7-1.2 5.9-1.1 8.7.6v13.4c-2.8-1.6-6-1.7-8.7-.6zM12.8 6.2c2.8-1.7 6-1.8 8.7-.6v13.4c-2.7-1.1-5.9-1-8.7.6z"/></svg>Дебюты</a><a href="https://sw3ptop.github.io/chess-revizor/profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Профиль</a></nav>
     <div class="hdr">
       <h1><button class="back" id="h-back" aria-label="Сменить соперника" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><span id="h-title">Подготовка</span> <span class="vs" id="h-vs">тренажёр</span></h1>
       <div class="score" id="scoreBox" hidden><b id="solvedN">0</b> решено<br><span id="solvedOf">из 0</span></div>
