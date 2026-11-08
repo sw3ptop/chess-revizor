@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#262421">
+<style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
+<title>Профиль игрока</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Nunito+Sans:opsz,wght@6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+/* Layout: one phone column of cards — summary, accuracy trend, what to fix, openings, games with expandable mistake reviews */
+:root{
+  color-scheme:dark;
+  --bg:#262421; --card:#302E2B; --card-2:#3A3835; --bar:#403E3B; --ink:#FFFFFF; --ink-2:#DAD8D5; --muted:#9F9D9A; --line:#4A4744;
+  --green:#81B64C; --green-d:#45753C; --red:#FA412D; --amber:#F7C045; --blue:#749BBF; --teal:#26C2A3; --orange:#FFA459;
+  --sq-l:#EBECD0; --sq-d:#739552;
+  --f-head:"Montserrat","Nunito Sans",system-ui,sans-serif;
+  --f-ui:"Nunito Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --gut:max(12px,env(safe-area-inset-left,0px)); --gut-r:max(12px,env(safe-area-inset-right,0px));
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{touch-action:manipulation}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.4;
+  padding-left:var(--gut);padding-right:var(--gut-r);padding-block:0 40px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;touch-action:manipulation}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.app{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding:10px 0 6px;display:flex;flex-direction:column;gap:8px}
+.nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;font-weight:800;font-size:13.5px;color:var(--ink-2);background:var(--card-2);border-radius:999px;padding:7px 13px}
+.nav a[aria-current="page"]{background:#fff;color:#312E2B}
+.hdr{display:flex;align-items:center;gap:12px}
+.ava{width:52px;height:52px;border-radius:12px;background:var(--green);display:grid;place-items:center;flex:none}
+.ava i{width:40px;height:40px}
+.hdr h1{margin:0;font-family:var(--f-head);font-weight:800;font-size:23px;line-height:1.1}
+.hdr small{display:block;color:var(--muted);font-weight:700;font-size:13px;margin-top:3px}
+.card{background:var(--card);border-radius:14px;padding:15px;min-width:0}
+.card h2{font-family:var(--f-head);font-size:16px;font-weight:800;margin:0 0 12px}
+.hero{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.ring{width:118px;height:118px;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .v b{font-family:var(--f-head);font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.ring .v span{font-size:11.5px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{background:var(--card-2);border-radius:10px;padding:9px 11px;min-width:0}
+.kpi b{display:block;font-family:var(--f-head);font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.kpi span{font-size:12px;color:var(--muted);font-weight:700}
+.kpi .up{color:var(--green)}.kpi .down{color:var(--red)}
+.chart{width:100%;height:150px;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);font-weight:700;margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.fix{display:flex;flex-direction:column;gap:9px}
+.fx{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;background:var(--card-2);border-radius:12px;padding:11px 12px}
+.fx .n{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-family:var(--f-head);font-weight:800;font-size:17px;color:#fff}
+.fx b{font-size:15px}
+.fx p{margin:3px 0 0;font-size:13.5px;color:var(--ink-2);font-weight:600}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;color:var(--muted);font-weight:800;font-size:12px;padding:0 6px 6px 0}
+.tbl td{padding:8px 6px 8px 0;border-top:1px solid var(--line);font-weight:700;font-variant-numeric:tabular-nums;vertical-align:middle}
+.tbl td.r{text-align:right}
+.tbl .ln{font-weight:800;color:#fff}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;border:1.5px solid var(--muted);vertical-align:-1px;margin-right:6px}
+.sw.w{background:#fff}.sw.b{background:#1E1C1A}
+.score{display:inline-flex;gap:4px}
+.score i{font-style:normal;font-size:12px;font-weight:800;border-radius:5px;padding:2px 6px}
+.score .w{background:rgba(129,182,76,.2);color:#A6D86F}.score .l{background:rgba(250,65,45,.18);color:#FF8A7A}.score .d{background:var(--bar);color:var(--ink-2)}
+.filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:6px 12px;border-radius:999px;background:var(--card-2);font-weight:800;font-size:13px;color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:#fff;color:#312E2B}
+.games{display:flex;flex-direction:column;gap:7px}
+.g{background:var(--card-2);border-radius:12px;overflow:hidden}
+.gh{display:grid;grid-template-columns:6px 1fr auto;gap:11px;align-items:center;width:100%;text-align:left;padding:0 12px 0 0}
+.gh .rs{align-self:stretch;background:var(--muted)}
+.g.win .rs{background:var(--green)}.g.loss .rs{background:var(--red)}
+.gh .t{padding:10px 0;min-width:0}
+.gh .t b{font-size:15px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gh .t b span{color:var(--muted);font-weight:700;font-size:12.5px;margin-left:5px}
+.gh .t small{display:block;color:var(--muted);font-weight:700;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gh .a{text-align:right}
+.gh .a b{display:block;font-family:var(--f-head);font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+.gh .a small{font-size:12px;font-weight:800;color:var(--muted)}
+.gh .a small.bad{color:#FF8A7A}
+.gd{padding:4px 12px 14px;display:flex;flex-direction:column;gap:12px}
+.curve{width:100%;height:70px;display:block;border-radius:8px;background:#1E1C1A}
+.mk{display:grid;grid-template-columns:minmax(0,150px) 1fr;gap:12px;align-items:start}
+@media (max-width:420px){.mk{grid-template-columns:minmax(0,120px) 1fr}}
+.mb{position:relative;aspect-ratio:1/1;width:100%;border-radius:6px;overflow:hidden;container-type:inline-size}
+.mb .grid{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);width:100%;height:100%}
+.mb .s{position:relative}.mb .s.l{background:var(--sq-l)}.mb .s.d{background:var(--sq-d)}
+.mb .s.hl::after{content:"";position:absolute;inset:0;background:#F5F682;opacity:.55}
+.mb i{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.mb svg.ar{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.mt b{font-size:14.5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.tag{font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 8px;color:#fff}
+.tag.blunder{background:var(--red)}.tag.mistake{background:var(--orange)}.tag.inaccuracy{background:var(--amber);color:#312E2B}
+.mt p{margin:5px 0 0;font-size:14px;color:var(--ink-2);font-weight:600;line-height:1.4}
+.mt .bm{margin-top:6px;font-size:13px;font-weight:800;color:#A6D86F}
+.mt .pm{font-size:13px;font-weight:800;color:#FF8A7A;margin-top:6px}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;text-decoration:none;font-weight:800;font-size:13.5px;border-radius:10px;padding:9px 13px;box-shadow:0 3px 0 var(--green-d)}
+.btn.ghost{background:var(--bar);box-shadow:0 3px 0 #2A2826}
+.more{display:block;width:100%;margin-top:10px;padding:11px;border-radius:10px;background:var(--card-2);font-weight:800;color:var(--ink-2)}
+.empty{color:var(--muted);font-weight:700;font-size:14px;padding:8px 0}
+.foot{font-size:12.5px;color:var(--muted);margin:4px 2px 0}
+.cp{display:block;background-size:cover;background-repeat:no-repeat;background-position:center}
+.cp.cp-wp{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==")}
+.cp.cp-wb{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiNmZmYiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PC9nPjwvc3ZnPg==")}
+.cp.cp-wn{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjMDAwIi8+PC9nPjwvc3ZnPg==")}
+.cp.cp-wr{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy0zdi00aDIxdjRIMTJ6bS0xLTIyVjloNHYyaDVWOWg1djJoNVY5aDR2NSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMzQgMTRsLTMgM0gxNGwtMy0zIi8+PHBhdGggZD0iTTMxIDE3djEyLjVIMTRWMTciIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMxIDI5LjVsMS41IDIuNWgtMjBsMS41LTIuNSIvPjxwYXRoIGQ9Ik0xMSAxNGgyMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4=")}
+.cp.cp-wq{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik04IDEyYTIgMiAwIDEgMS00IDAgMiAyIDAgMSAxIDQgMHptMTYuNS00LjVhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAwek00MSAxMmEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTE2IDguNWEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTMzIDlhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAweiIvPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi0xMi03IDExVjExbC01LjUgMTMuNS0zLTE1LTMgMTUtNS41LTE0VjI1TDcgMTRsMiAxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTkgMjZjMCAyIDEuNSAyIDIuNSA0IDEgMS41IDEgMSAuNSAzLjUtMS41IDEtMS41IDIuNS0xLjUgMi41LTEuNSAxLjUuNSAyLjUuNSAyLjUgNi41IDEgMTYuNSAxIDIzIDAgMCAwIDEuNS0xIDAtMi41IDAgMCAuNS0xLjUtMS0yLjUtLjUtMi41LS41LTIgLjUtMy41IDEtMiAyLjUtMiAyLjUtNC04LjUtMS41LTE4LjUtMS41LTI3IDB6IiBzdHJva2UtbGluZWNhcD0iYnV0dCIvPjxwYXRoIGQ9Ik0xMS41IDMwYzMuNS0xIDE4LjUtMSAyMiAwTTEyIDMzLjVjNi0xIDE1LTEgMjEgMCIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4=")}
+.cp.cp-wk{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjZNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTIyLjUgMjVzNC41LTcuNSAzLTEwLjVjMCAwLTEtMi41LTMtMi41cy0zIDIuNS0zIDIuNWMtMS41IDMgMyAxMC41IDMgMTAuNSIgZmlsbD0iI2ZmZiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTEuNSAzN2M1LjUgMy41IDE1LjUgMy41IDIxIDB2LTdzOS00LjUgNi0xMC41Yy00LTYuNS0xMy41LTMuNS0xNiA0VjI3di0zLjVjLTMuNS03LjUtMTMtMTAuNS0xNi00LTMgNiA1IDEwIDUgMTBWMzd6IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTExLjUgMzBjNS41LTMgMTUuNS0zIDIxIDBtLTIxIDMuNWM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwIi8+PC9nPjwvc3ZnPg==")}
+.cp.cp-bp{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==")}
+.cp.cp-bb{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiMwMDAiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48L2c+PC9zdmc+")}
+.cp.cp-bn{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjZWNlY2VjIiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMjQuNTUgMTAuNGwtLjQ1IDEuNDUuNS4xNWMzLjE1IDEgNS42NSAyLjQ5IDcuOSA2Ljc1UzM1Ljc1IDI5LjA2IDM1LjI1IDM5bC0uMDUuNWgyLjI1bC4wNS0uNWMuNS0xMC4wNi0uODgtMTYuODUtMy4yNS0yMS4zNC0yLjM3LTQuNDktNS43OS02LjY0LTkuMTktNy4xNmwtLjUxLS4xeiIgZmlsbD0iI2VjZWNlYyIgc3Ryb2tlPSJub25lIi8+PC9nPjwvc3ZnPg==")}
+.cp.cp-br{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy41LTdsMS41LTIuNWgxN2wxLjUgMi41aC0yMHptLS41IDR2LTRoMjF2NEgxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTE0IDI5LjV2LTEzaDE3djEzSDE0eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTQgMTYuNUwxMSAxNGgyM2wtMyAyLjVIMTR6TTExIDE0VjloNHYyaDVWOWg1djJoNVY5aDR2NUgxMXoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTEyIDM1LjVoMjFtLTIwLTRoMTltLTE4LTJoMTdtLTE3LTEzaDE3TTExIDE0aDIzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4=")}
+.cp.cp-bq{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIHN0cm9rZT0ibm9uZSI+PGNpcmNsZSBjeD0iNiIgY3k9IjEyIiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMTQiIGN5PSI5IiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjgiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzMSIgY3k9IjkiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzOSIgY3k9IjEyIiByPSIyLjc1Ii8+PC9nPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi41LTEyLjVMMzEgMjVsLS4zLTE0LjEtNS4yIDEzLjYtMy0xNC41LTMgMTQuNS01LjItMTMuNkwxNCAyNSA2LjUgMTMuNSA5IDI2eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNOSAyNmMwIDIgMS41IDIgMi41IDQgMSAxLjUgMSAxIC41IDMuNS0xLjUgMS0xLjUgMi41LTEuNSAyLjUtMS41IDEuNS41IDIuNS41IDIuNSA2LjUgMSAxNi41IDEgMjMgMCAwIDAgMS41LTEgMC0yLjUgMCAwIC41LTEuNS0xLTIuNS0uNS0yLjUtLjUtMiAuNS0zLjUgMS0yIDIuNS0yIDIuNS00LTguNS0xLjUtMTguNS0xLjUtMjcgMHoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTExIDM4LjVhMzUgMzUgMSAwIDAgMjMgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMTEgMjlhMzUgMzUgMSAwIDEgMjMgMG0tMjEuNSAyLjVoMjBtLTIxIDNhMzUgMzUgMSAwIDAgMjIgMG0tMjMgM2EzNSAzNSAxIDAgMCAyNCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiLz48L2c+PC9zdmc+")}
+.cp.cp-bk{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjYiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMjIuNSAyNXM0LjUtNy41IDMtMTAuNWMwIDAtMS0yLjUtMy0yLjVzLTMgMi41LTMgMi41Yy0xLjUgMyAzIDEwLjUgMyAxMC41IiBmaWxsPSIjMDAwIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjxwYXRoIGQ9Ik0xMS41IDM3YzUuNSAzLjUgMTUuNSAzLjUgMjEgMHYtN3M5LTQuNSA2LTEwLjVjLTQtNi41LTEzLjUtMy41LTE2IDRWMjd2LTMuNWMtMy41LTcuNS0xMy0xMC41LTE2LTQtMyA2IDUgMTAgNSAxMFYzN3oiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMyIDI5LjVzOC41LTQgNi4wMy05LjY1QzM0LjE1IDE0IDI1IDE4IDIyLjUgMjQuNWwuMDEgMi4xLS4wMS0yLjFDMjAgMTggOS45MDYgMTQgNi45OTcgMTkuODVjLTIuNDk3IDUuNjUgNC44NTMgOSA0Ljg1MyA5IiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMTEuNSAzMGM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwbS0yMSAzLjVjNS41LTMgMTUuNS0zIDIxIDAiIHN0cm9rZT0iI2VjZWNlYyIvPjwvZz48L3N2Zz4=")}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <nav class="nav" aria-label="Разделы сайта">
+      <a href="index.html">Разбор партии</a>
+      <a href="repertoire.html">Мои дебюты</a>
+      <a href="profile.html" aria-current="page">Профиль</a>
+    </nav>
+    <div class="hdr">
+      <div class="ava"><i class="cp cp-wn"></i></div>
+      <div><h1 id="pName">Профиль</h1><small id="pSub">Загружаю…</small></div>
+    </div>
+  </header>
+
+  <section class="card">
+    <div class="hero">
+      <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#403E3B" stroke-width="12"/><circle id="ringArc" cx="60" cy="60" r="52" fill="none" stroke="#81B64C" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 400"/></svg>
+        <div class="v"><b id="accAll">—</b><span>точность</span></div></div>
+      <div class="kpis">
+        <div class="kpi"><b id="kGames">—</b><span>партий разобрано</span></div>
+        <div class="kpi"><b id="kScore">—</b><span>победы · ничьи · поражения</span></div>
+        <div class="kpi"><b id="kRecent">—</b><span>точность за 20 последних</span></div>
+        <div class="kpi"><b id="kBl">—</b><span>зевков за партию</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Точность по партиям</h2>
+    <svg class="chart" id="chart" role="img" aria-label="Точность по партиям"></svg>
+    <div class="legend"><span><i style="background:#81B64C"></i>победа</span><span><i style="background:#FA412D"></i>поражение</span><span><i style="background:#9F9D9A"></i>ничья</span><span><i style="background:#fff;border-radius:2px;height:3px;width:14px"></i>среднее за 5 партий</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Над чем работать</h2>
+    <div class="fix" id="fix"></div>
+    <div class="links" style="margin-top:12px"><a class="btn" href="repertoire.html#m">Тренировать мои ошибки</a></div>
+  </section>
+
+  <section class="card">
+    <h2>Белыми и чёрными</h2>
+    <div style="overflow-x:auto"><table class="tbl" id="tColor"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Дебюты</h2>
+    <div style="overflow-x:auto"><table class="tbl" id="tOpen"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Партии</h2>
+    <div class="filters" id="filters">
+      <button class="chip" data-f="" aria-pressed="true">Все</button>
+      <button class="chip" data-f="loss" aria-pressed="false">Поражения</button>
+      <button class="chip" data-f="win" aria-pressed="false">Победы</button>
+      <button class="chip" data-f="bl" aria-pressed="false">С зевками</button>
+    </div>
+    <div class="games" id="games"></div>
+    <button class="more" id="more" hidden>Показать ещё</button>
+  </section>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const SNAP=window.__SNAP||null;
+const TC={bullet:"Пуля",blitz:"Блиц",rapid:"Рапид",daily:"Переписка"};
+const RES={win:"Победа",loss:"Поражение",draw:"Ничья"};
+const KIND={
+  hung:{t:"Подставляешь фигуры",c:"var(--red)",tip:"После твоего хода фигура остаётся под боем. Перед каждым ходом проверь: что он сможет взять после него?"},
+  missed_win:{t:"Не забираешь подаренное",c:"var(--orange)",tip:"Соперник что-то подставил, а ты не взял. После его хода сначала посмотри все свои взятия."},
+  mate_allowed:{t:"Пропускаешь мат",c:"var(--red)",tip:"Проверяй его шахи, особенно по последней горизонтали. Сделай «форточку» ходом h3 или h6."},
+  mate_missed:{t:"Не видишь мат",c:"var(--amber)",tip:"У тебя был мат, а ты его не нашёл. Ищи шахи первыми, особенно когда король соперника зажат."},
+  position:{t:"Позиционные ошибки",c:"var(--blue)",tip:"Материал цел, но позиция стала хуже: фигура ушла на плохое поле или открылся король."}
+};
+let P=null, filter="", shown=12;
+const cache={};
+async function getJSON(u){ const r=await fetch(u,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); return r.json(); }
+
+function ring(v){ const c=2*Math.PI*52; $("ringArc").setAttribute("stroke-dasharray",`${(v/100*c).toFixed(1)} ${c.toFixed(1)}`); }
+function renderTop(){
+  const t=P.total, last=P.games[0];
+  $("pName").textContent=P.player;
+  $("pSub").textContent=`${last&&last.myElo?`Рейтинг ${last.myElo} · `:""}обновлено ${new Date(P.updated).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}`;
+  $("accAll").textContent=t.acc??"—"; ring(t.acc||0);
+  $("kGames").textContent=t.n;
+  $("kScore").innerHTML=`<span class="up">${t.win}</span> · ${t.draw} · <span class="down">${t.loss}</span>`;
+  const d=(P.recent.acc||0)-(t.acc||0);
+  $("kRecent").innerHTML=`${P.recent.acc??"—"} <small class="${d>=0?"up":"down"}" style="font-size:13px">${d>=0?"▲":"▼"}${Math.abs(d).toFixed(1)}</small>`;
+  $("kBl").textContent=P.blundersPerGame;
+  $("foot").textContent=`Каждая партия разобрана движком Stockfish. Данные обновляются автоматически после новых партий на chess.com. Фигуры: Colin M.L. Burnett, CC BY-SA 3.0.`;
+}
+function renderChart(){
+  const svg=$("chart"), W=svg.clientWidth||600, H=150, pad={l:28,r:8,t:8,b:18};
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  const G=P.games.slice().reverse().filter(g=>g.acc!=null).slice(-60);
+  if(G.length<2){ svg.innerHTML=""; return; }
+  const x=i=>pad.l+i/(G.length-1)*(W-pad.l-pad.r), y=v=>pad.t+(100-v)/100*(H-pad.t-pad.b);
+  let s="";
+  for(const v of [25,50,75,100]){ s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="#403E3B" stroke-width="1"/><text x="${pad.l-6}" y="${y(v)+4}" fill="#9F9D9A" font-size="10" text-anchor="end" font-weight="700">${v}</text>`; }
+  const ma=G.map((_,i)=>{ const w=G.slice(Math.max(0,i-4),i+1); return w.reduce((a,g)=>a+g.acc,0)/w.length; });
+  s+=`<path d="${ma.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+","+y(v).toFixed(1)).join("")}" fill="none" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>`;
+  G.forEach((g,i)=>{ s+=`<circle cx="${x(i).toFixed(1)}" cy="${y(g.acc).toFixed(1)}" r="3.6" fill="${g.result==="win"?"#81B64C":g.result==="loss"?"#FA412D":"#9F9D9A"}" stroke="#302E2B" stroke-width="1.2"><title>${esc(g.date)} · ${esc(g.opp)} · ${g.acc}</title></circle>`; });
+  s+=`<circle cx="${x(G.length-1)}" cy="${y(ma[ma.length-1])}" r="5" fill="#fff"/>`;
+  svg.innerHTML=s;
+}
+function renderFix(){
+  const k=Object.entries(P.kinds||{}).sort((a,b)=>(a[0]==="position")-(b[0]==="position")||b[1]-a[1]);
+  const tot=k.reduce((a,x)=>a+x[1],0)||1;
+  let h=k.slice(0,3).map(([id,n])=>{ const K=KIND[id]||KIND.position; return `<div class="fx"><span class="n" style="background:${K.c}">${Math.round(n/tot*100)}%</span><div><b>${K.t}</b> <span style="color:var(--muted);font-weight:700;font-size:13px">· ${n} раз</span><p>${K.tip}</p></div></div>`; }).join("");
+  const ph=P.phases||{}, top=Object.entries(ph).sort((a,b)=>b[1]-a[1])[0];
+  if(top) h+=`<div class="fx"><span class="n" style="background:var(--bar)">!</span><div><b>Чаще всего ошибаешься в фазе: ${top[0]}</b><p>${Object.entries(ph).map(([a,b])=>`${a} — ${b}`).join(", ")}.${P.timeTrouble?` В ${P.timeTrouble} партиях у тебя оставалось меньше 30 секунд.`:""}</p></div></div>`;
+  $("fix").innerHTML=h||`<p class="empty">Пока мало данных.</p>`;
+}
+const sc=s=>`<span class="score"><i class="w">${s.win}</i><i class="d">${s.draw}</i><i class="l">${s.loss}</i></span>`;
+function renderTables(){
+  const rows=[["w","Белыми",P.byColor.w],["b","Чёрными",P.byColor.b]].filter(r=>r[2].n);
+  $("tColor").innerHTML=`<tr><th></th><th>Партий</th><th>Счёт</th><th class="r">Точность</th></tr>`+rows.map(([c,n,s])=>`<tr><td class="ln"><span class="sw ${c}"></span>${n}</td><td>${s.n}</td><td>${sc(s)}</td><td class="r">${s.acc??"—"}</td></tr>`).join("")+
+    Object.entries(P.byTc).map(([k,s])=>`<tr><td class="ln">${TC[k]||k}</td><td>${s.n}</td><td>${sc(s)}</td><td class="r">${s.acc??"—"}</td></tr>`).join("");
+  $("tOpen").innerHTML=P.openings.length?`<tr><th>Начало</th><th>Партий</th><th>Счёт</th><th class="r">Точность</th></tr>`+P.openings.map(o=>`<tr><td class="ln"><span class="sw ${o.me}"></span>${esc(o.line)}</td><td>${o.n}</td><td>${sc(o)}</td><td class="r">${o.acc??"—"}</td></tr>`).join(""):`<tr><td class="empty">Пока мало повторяющихся дебютов.</td></tr>`;
+}
+function rel(d){ const x=new Date(d+"T12:00:00"); return x.toLocaleDateString("ru-RU",{day:"numeric",month:"short"}); }
+function renderGames(){
+  let L=P.games;
+  if(filter==="win"||filter==="loss") L=L.filter(g=>g.result===filter);
+  if(filter==="bl") L=L.filter(g=>g.blunders>0);
+  $("games").innerHTML=L.slice(0,shown).map(g=>`<div class="g ${g.result}" data-id="${g.id}"><button class="gh" aria-expanded="false"><span class="rs"></span><span class="t"><b><span class="sw ${g.me}"></span>${esc(g.opp)}<span>${g.oppElo||""}</span></b><small>${RES[g.result]} · ${TC[g.tc]||g.tc} · ${rel(g.date)} · ${esc(g.opening)}</small></span><span class="a"><b>${g.acc??"—"}</b><small class="${g.blunders?"bad":""}">${g.blunders?`${g.blunders} зевк${g.blunders===1?"":g.blunders<5?"а":"ов"}`:"без зевков"}</small></span></button><div class="gd" hidden></div></div>`).join("")||`<p class="empty">Нет партий.</p>`;
+  $("more").hidden=L.length<=shown;
+}
+$("more").onclick=()=>{ shown+=12; renderGames(); };
+$("filters").addEventListener("click",e=>{ const b=e.target.closest(".chip"); if(!b) return; filter=b.dataset.f; shown=12; document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",c===b)); renderGames(); });
+$("games").addEventListener("click",async e=>{
+  const b=e.target.closest(".gh"); if(!b) return;
+  const box=b.parentElement, d=box.querySelector(".gd"), id=box.dataset.id;
+  const open=b.getAttribute("aria-expanded")==="true";
+  b.setAttribute("aria-expanded",!open); d.hidden=open; if(open||d.dataset.ok) return;
+  d.innerHTML=`<p class="empty">Загружаю разбор…</p>`;
+  try{ const g=cache[id]||(SNAP&&SNAP.games&&SNAP.games[id])||await getJSON(`data/games/${id}.json`); cache[id]=g; d.innerHTML=gameDetail(g); d.dataset.ok=1; drawCurve(d.querySelector(".curve"),g.curve); }
+  catch(err){ d.innerHTML=`<p class="empty">Не удалось загрузить разбор этой партии.</p>`; }
+});
+function drawCurve(svg,c){
+  const W=svg.clientWidth||600,H=70; svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  const x=i=>i/(c.length-1)*W, y=v=>(100-v)/100*H;
+  svg.innerHTML=`<path d="${c.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+","+y(v).toFixed(1)).join("")}L${W},${H}L0,${H}Z" fill="#E8E6E1"/><line x1="0" x2="${W}" y1="${H/2}" y2="${H/2}" stroke="#8B8986" stroke-dasharray="3 4" opacity=".7"/>`;
+}
+const PN={p:"p",n:"n",b:"b",r:"r",q:"q",k:"k"};
+function miniBoard(fen,side,played,best,last){
+  const c=new Chess(fen), bd=c.board(), flip=side==="b";
+  const sqxy=sq=>{ const f="abcdefgh".indexOf(sq[0]), r=+sq[1]; return flip?[7-f+.5,r-1+.5]:[f+.5,8-r+.5]; };
+  const arrow=(u,col)=>{ if(!u) return ""; const [x1,y1]=sqxy(u.from),[x2,y2]=sqxy(u.to); const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy),ux=dx/len,uy=dy/len,nx=-uy,ny=ux,hd=.42,hw=.3,sw=.12,bx=x2-ux*hd,by=y2-uy*hd;
+    return `<polygon points="${[[x1+nx*sw,y1+ny*sw],[bx+nx*sw,by+ny*sw],[bx+nx*hw,by+ny*hw],[x2,y2],[bx-nx*hw,by-ny*hw],[bx-nx*sw,by-ny*sw],[x1-nx*sw,y1-ny*sw]].map(p=>p[0].toFixed(2)+","+p[1].toFixed(2)).join(" ")}" fill="${col}" opacity=".85"/>`; };
+  const mv=s=>{ try{ return new Chess(fen).move(s); }catch(e){ return null; } };
+  const pm=mv(played), bm=mv(best);
+  let h="";
+  for(let dr=0;dr<8;dr++) for(let dc=0;dc<8;dc++){ const rank=flip?dr+1:8-dr, file=flip?7-dc:dc, sq="abcdefgh"[file]+rank, p=bd[8-rank][file];
+    const hl=last&&(sq===last.slice(0,2)||sq===last.slice(2,4));
+    h+=`<div class="s ${(file+rank)%2?"l":"d"}${hl?" hl":""}">${p?`<i class="cp cp-${p.color}${PN[p.type]}"></i>`:""}</div>`; }
+  return `<div class="mb"><div class="grid">${h}</div><svg class="ar" viewBox="0 0 8 8">${arrow(pm,"#FA412D")}${arrow(bm,"#81B64C")}</svg></div>`;
+}
+function mistakeHtml(g,m){
+  return `<div class="mk">${miniBoard(m.fen,g.me,m.played,m.best[0],m.last)}<div class="mt"><b>${esc(m.label)} <span class="tag ${m.cls}">${m.cls==="blunder"?"зевок":"ошибка"}</span></b>
+    <p>${esc(m.text)}</p><div class="pm">✕ ${esc(m.played)} <span class="bm" style="margin-left:8px">✓ ${esc(m.best[0])}</span></div></div></div>`;
+}
+function gameDetail(g){
+  const ms=g.mistakes.slice().sort((a,b)=>b.loss-a.loss);
+  const top=ms.slice(0,5).sort((a,b)=>a.ply-b.ply), rest=ms.slice(5).sort((a,b)=>a.ply-b.ply);
+  const head=`<div class="links"><a class="btn ghost" href="${esc(g.url)}" target="_blank" rel="noopener">Открыть на chess.com</a></div>
+    <svg class="curve" role="img" aria-label="Оценка по ходу партии"></svg>
+    <p style="margin:0;color:var(--ink-2);font-weight:700;font-size:13.5px">Точность: ты ${g.acc} · соперник ${g.accOpp}. ${g.cls.blunder?`Зевков: ${g.cls.blunder}. `:""}${g.cls.mistake?`Ошибок: ${g.cls.mistake}. `:""}${g.cls.best?`Лучших ходов: ${g.cls.best}.`:""}${ms.length>5?` Ниже — 5 самых дорогих ошибок.`:""}</p>`;
+  if(!ms.length) return head+`<p class="empty">Крупных ошибок нет. Отличная партия!</p>`;
+  return head+top.map(m=>mistakeHtml(g,m)).join("")+(rest.length?`<details><summary class="more" style="list-style:none;text-align:center;cursor:pointer">Остальные ошибки (${rest.length})</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">${rest.map(m=>mistakeHtml(g,m)).join("")}</div></details>`:"");
+}
+let rz; window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>P&&renderChart(),150); });
+let lastT=0; document.addEventListener("touchend",e=>{ if(e.target.closest("input,select,textarea,label,summary")) return; const n=Date.now(); if(n-lastT<350){ e.preventDefault(); const t=e.target.closest("button,a"); if(t) t.click(); } lastT=n; },{passive:false});
+
+(async()=>{
+  try{ P=await getJSON("data/profile.json"); }
+  catch(e){ P=SNAP&&SNAP.profile; }
+  if(!P){ $("pSub").textContent="Данных пока нет: анализ ещё не запускался."; return; }
+  renderTop(); renderChart(); renderFix(); renderTables(); renderGames();
+})();
+})();
+</script>
+</body>
+</html>

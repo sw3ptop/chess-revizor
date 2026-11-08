@@ -15,3 +15,18 @@
 - **Ссылка или ник**: введи ник любого из игроков (и, если есть, ссылку на партию), и страница сама подтянет её через публичный API chess.com.
 
 Разбирай только завершённые партии.
+
+## Профиль и автоанализ
+
+- **profile.html** — средняя точность, разбор каждой партии и что исправить.
+- Новые ошибки сами попадают во вкладку «Ошибки» в **repertoire.html**.
+- Данные лежат в `data/` и обновляются сервисом `worker/` на VPS: он раз в 15 минут скачивает новые партии с chess.com, разбирает их Stockfish и делает push.
+
+Установка на VPS (Ubuntu/Debian, root):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sw3ptop/chess-revizor/main/worker/setup.sh | bash
+```
+
+Скрипт покажет ключ — добавь его в Settings → Deploy keys с галочкой «Allow write access» и нажми Enter.
+Лог: `journalctl -u chess-scout -n 30`. Запустить вручную: `systemctl start chess-scout`.
