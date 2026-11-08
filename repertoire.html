@@ -35,7 +35,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 @media (min-width:640px){.bleed{margin-left:0;margin-right:0}}
 
 /* header + tabs */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg-2);padding-top:8px;margin-left:calc(-1*var(--gut));margin-right:calc(-1*var(--gut-r));padding-left:var(--gut);padding-right:var(--gut-r);}
+.top{position:relative;z-index:1;background:var(--bg-2);padding-top:8px;margin-left:calc(-1*var(--gut));margin-right:calc(-1*var(--gut-r));padding-left:var(--gut);padding-right:var(--gut-r);}
 .hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;height:46px}
 .hdr h1{margin:0;font-family:var(--f-head);font-weight:800;font-size:21px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 .hdr h1 .vs{font-size:12px;font-family:var(--f-ui);font-weight:800;background:var(--bar);color:var(--ink-2);border-radius:6px;padding:3px 8px}
@@ -201,7 +201,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;paddin
 .grp{font-weight:800;font-size:13px;color:var(--muted);margin:8px 2px 2px;text-transform:uppercase;letter-spacing:.05em}
 .grp:first-child{margin-top:0}
 .relink{color:var(--green);font-weight:800;font-size:13px;text-decoration:underline}
-.sitenav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:#3A3835;border-radius:12px;padding:4px;margin:10px 0 6px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:45;box-shadow:0 6px 0 6px #262421}
+.sitenav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:#3A3835;border-radius:12px;padding:4px;margin:10px 0 6px;position:relative;z-index:1}
 .sitenav a{display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:9px;text-decoration:none;color:#DAD8D5;font-family:"Nunito Sans",system-ui,-apple-system,sans-serif;font-weight:800;font-size:13.5px;white-space:nowrap}
 .sitenav a svg{width:16px;height:16px;flex:none}
 .sitenav a[aria-current="page"]{background:#81B64C;color:#fff;box-shadow:0 2px 0 #45753C}
