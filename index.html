@@ -141,8 +141,11 @@ piece.mini{display:inline-block}
   :root{--bw:min(620px,calc(100vh - 400px))}
   .app{max-width:1480px}
   .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,var(--bw)) minmax(0,1fr);gap:22px;align-items:start}
-  .lcol{order:0;margin-top:8px}.ccol{order:1}.rcol{order:2;margin-top:8px}
-  .moves{max-height:calc(100vh - 380px);min-height:220px}
+  .lcol{order:0;margin-top:6px}.ccol{order:1}.rcol{order:2;margin-top:6px}
+  .lcol .card:last-child{flex:1;min-height:0;display:flex;flex-direction:column}
+  .lcol .moves{flex:1;max-height:none;min-height:0;align-content:start}
+  .rcol .card{flex:1;min-height:0;overflow:auto}
+  .rcol .summary{gap:3px 8px}.rcol .players{margin-bottom:10px}.rcol .accs{margin-bottom:10px}
   .graph{height:140px}
   .abar-in{max-width:max(360px,var(--bw))}
   .foot{max-width:var(--bw);margin-left:auto!important;margin-right:auto!important;text-align:center}
@@ -1173,7 +1176,16 @@ $("searchform").addEventListener("submit",e=>{ e.preventDefault(); S.depth=+$("d
 $("link").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); S.depth=+$("depth").value; lookup(); }});
 $("filters").addEventListener("click",e=>{ const b=e.target.closest(".fchip"); if(!b) return; FILTER=b.dataset.f; document.querySelectorAll(".fchip").forEach(x=>x.setAttribute("aria-pressed",x===b)); renderGames(); });
 try{ const d=localStorage.getItem("revizor-depth"); if(d){ $("depth").value=d; S.depth=+d; } }catch(_){}
-let rz; window.addEventListener("resize",()=>{clearTimeout(rz); rz=setTimeout(()=>{renderGraph();renderStrip();},120);});
+let rz; window.addEventListener("resize",()=>{clearTimeout(rz); rz=setTimeout(()=>{renderGraph();renderStrip();fitCols();},120);});
+// desktop: side columns end exactly at the bottom edge of the board
+function fitCols(){
+  const cols=document.querySelectorAll(".lcol,.rcol");
+  if(innerWidth<1100){ cols.forEach(c=>c.style.height=""); return; }
+  const bb=$("board").getBoundingClientRect().bottom;
+  cols.forEach(c=>{ c.style.height=Math.max(240,bb-c.getBoundingClientRect().top)+"px"; });
+}
+if(window.ResizeObserver) new ResizeObserver(()=>fitCols()).observe(document.querySelector(".ccol"));
+window.addEventListener("load",fitCols); fitCols();
 try{ const n=localStorage.getItem("revizor-nick"); if(n) $("nick").value=n; }catch(e){}
 
 function loadClassic(){
