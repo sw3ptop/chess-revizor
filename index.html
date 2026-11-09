@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#262421">
 <style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
 <title>Ревизор партий</title>
+<link rel="icon" href="favicon.svg?v=11092000" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=11092000">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Nunito+Sans:opsz,wght@6..12,600;6..12,700;6..12,800&display=swap">
@@ -129,8 +131,24 @@ piece.mini{display:inline-block}
 .nav.back:active{box-shadow:0 2px 0 #2E2C2A}.nav.fwd:active{box-shadow:0 2px 0 var(--green-d)}
 .nav:disabled{opacity:.35;transform:none;cursor:default}
 
-/* below the fold */
-.more{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+/* below the board (phone) / side columns (desktop) */
+.layout{display:flex;flex-direction:column}
+.ccol{display:flex;flex-direction:column;min-width:0}
+.rcol,.lcol{display:flex;flex-direction:column;gap:12px;min-width:0}
+.rcol{margin-top:22px}.lcol{margin-top:12px}
+.foot{margin-top:12px!important}
+@media (min-width:1100px){
+  :root{--bw:min(620px,calc(100vh - 400px))}
+  .app{max-width:1480px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,var(--bw)) minmax(0,1fr);gap:22px;align-items:start}
+  .lcol{order:0;margin-top:8px}.ccol{order:1}.rcol{order:2;margin-top:8px}
+  .moves{max-height:calc(100vh - 380px);min-height:220px}
+  .graph{height:140px}
+  .abar-in{max-width:max(360px,var(--bw))}
+  .foot{max-width:var(--bw);margin-left:auto!important;margin-right:auto!important;text-align:center}
+  .coachrow{margin:12px 0 10px;min-height:104px}
+  .mstrip{margin-top:10px}
+}
 .card{background:var(--bg);border-radius:10px;padding:14px;min-width:0}
 h2{font-family:var(--f-head);font-size:16px;font-weight:800;margin:0 0 12px}
 .players{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:14px;text-align:center}
@@ -208,7 +226,17 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
 .fchip{flex:none;padding:7px 14px;border-radius:999px;background:var(--bg-2);font-weight:800;font-size:13.5px;color:var(--ink-2)}
 .fchip[aria-pressed="true"]{background:#fff;color:#312E2B}
 .games{display:flex;flex-direction:column;gap:8px}
-.gcard{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--bg-2);border-radius:14px;padding:11px 12px;text-align:left;border-left:4px solid var(--rc);transition:transform .1s}
+.gcard{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--bg-2);border-radius:14px;padding:10px 10px 10px 12px;text-align:left;border-left:4px solid var(--rc);transition:transform .1s;cursor:pointer}
+.gcard .rt{color:var(--rc);font-weight:800}
+.gcard .gm{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ana{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;font-weight:800;font-size:14.5px;border-radius:10px;padding:10px 14px;box-shadow:0 3px 0 var(--green-d);white-space:nowrap}
+.ana svg{width:16px;height:16px}
+.ana:active{transform:translateY(2px);box-shadow:0 1px 0 var(--green-d)}
+.plink{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bar);color:#fff;text-decoration:none;border-radius:12px;padding:12px 14px;font-weight:800;font-size:14.5px}
+.plink small{display:block;color:var(--muted);font-weight:700;font-size:12.5px}
+.plink svg{width:20px;height:20px;flex:none}
+.exn{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.exn button{background:var(--bar);border-radius:999px;padding:7px 13px;font-weight:800;font-size:13.5px;color:var(--ink-2)}
 .gcard:active{transform:scale(.985)}
 .gcard .gav{width:40px;height:40px;border-radius:9px;display:grid;place-items:center}
 .gcard .gav.w{background:#E8E6E1}.gcard .gav.b{background:#4A4643}
@@ -272,7 +300,7 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
 
 <div class="app">
   <div class="pinbar">
-  <nav class="sitenav" aria-label="Разделы"><a href="https://sw3ptop.github.io/chess-revizor/index.html?v=11081311" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Разбор</a><a href="https://sw3ptop.github.io/chess-revizor/repertoire.html?v=11081311"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 5.6c2.7-1.2 5.9-1.1 8.7.6v13.4c-2.8-1.6-6-1.7-8.7-.6zM12.8 6.2c2.8-1.7 6-1.8 8.7-.6v13.4c-2.7-1.1-5.9-1-8.7.6z"/></svg>Дебюты</a><a href="https://sw3ptop.github.io/chess-revizor/profile.html?v=11081311"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Профиль</a></nav>
+  <nav class="sitenav" aria-label="Разделы"><a href="https://sw3ptop.github.io/chess-revizor/index.html?v=11092000" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Разбор</a><a href="https://sw3ptop.github.io/chess-revizor/repertoire.html?v=11092000"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 5.6c2.7-1.2 5.9-1.1 8.7.6v13.4c-2.8-1.6-6-1.7-8.7-.6zM12.8 6.2c2.8-1.7 6-1.8 8.7-.6v13.4c-2.7-1.1-5.9-1-8.7.6z"/></svg>Дебюты</a><a href="https://sw3ptop.github.io/chess-revizor/profile.html?v=11092000"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Профиль</a></nav>
   <header class="hdr">
     <button class="ibtn" id="flip" aria-label="Перевернуть доску"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v15M3.5 15.5 7 19l3.5-3.5M17 20V5M13.5 8.5 17 5l3.5 3.5"/></svg></button>
     <h1>Разбор партии</h1>
@@ -283,6 +311,8 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
   </header>
   </div>
 
+  <div class="layout">
+  <main class="ccol">
   <div class="evalh" id="evalh"><div class="w" id="evalw" style="width:50%"></div><span class="lbl" id="evallbl">0.00</span></div>
   <div class="prog"><i id="progbar"></i></div>
   <div class="stat" id="statustxt">Запускаю движок…</div>
@@ -313,8 +343,9 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
 
     <nav class="strip" id="strip" aria-label="Ходы партии"></nav>
   </div>
+  </main>
 
-  <section class="more">
+  <aside class="rcol">
     <div class="card" id="sumcard">
       <h2>Итоги партии</h2>
       <div class="players" id="players"></div>
@@ -323,6 +354,9 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
       <div class="accs" id="grs"></div>
       <div class="summary" id="summary"></div>
     </div>
+  </aside>
+
+  <aside class="lcol">
     <div class="card">
       <h2>Оценка по ходу партии</h2>
       <svg class="graph" id="graph" role="img" aria-label="График оценки"></svg>
@@ -331,8 +365,9 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
       <h2>Все ходы</h2>
       <div class="moves" id="moves"></div>
     </div>
+  </aside>
+  </div>
     <p class="foot">Разбирай только завершённые партии: подсказки движка во время игры считаются нечестной игрой. Анализ делает Stockfish прямо в браузере, поэтому оценки близки к chess.com, но не совпадают один в один. Классические фигуры: Colin M.L. Burnett, лицензия CC BY-SA 3.0.</p>
-  </section>
 </div>
 
 <div class="abar">
@@ -349,7 +384,7 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
 <section class="sheet" id="sheet" aria-label="Поиск партии" aria-hidden="true">
   <div class="sheet-in">
     <div class="grab"></div>
-    <div class="shrow"><h3>Мои партии</h3><button class="xbtn" id="close" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="shrow"><h3>Партии игрока</h3><button class="xbtn" id="close" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <form class="search" id="searchform" autocomplete="off">
       <svg class="sic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
       <input type="text" id="nick" placeholder="Ник на chess.com" aria-label="Ник на chess.com" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
@@ -364,6 +399,7 @@ textarea{resize:vertical;min-height:120px;font-family:ui-monospace,Menlo,monospa
     </div>
     <div id="loadmsg" class="msg" hidden></div>
     <div id="games" class="games"></div>
+    <a class="plink" id="plink" hidden href="profile.html"><span><span id="plinkT">Профиль игрока</span><small>Точность, частые ошибки и дебюты по всем партиям</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></a>
     <details class="bylink">
       <summary>Найти партию по ссылке</summary>
       <input type="text" id="link" placeholder="https://www.chess.com/game/live/…" aria-label="Ссылка на партию" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
@@ -720,6 +756,8 @@ function relDate(t){
 }
 function renderGames(){
   const box=$("games"); box.innerHTML="";
+  const pl=$("plink"); pl.hidden=!GAMES.length||!GNICK;
+  if(GNICK){ const nm=($("nick").value||GNICK).trim(); pl.href="profile.html?u="+encodeURIComponent(nm); $("plinkT").textContent="Профиль игрока "+nm; }
   const list=GAMES.filter(g=>!FILTER||g.time_class===FILTER).slice(0,30);
   if(!GAMES.length) return;
   if(!list.length){ box.innerHTML=`<div class="empty"><b>Нет партий</b>В этом контроле времени партий за последнее время нет.</div>`; return; }
@@ -728,12 +766,12 @@ function renderGames(){
     const draw=DRAWS.includes(me.result);
     const res=me.result==="win"?["Победа","var(--c-best)"]:draw?["Ничья","#7C7976"]:["Поражение","var(--c-blunder)"];
     const how=HOW[me.result==="win"?op.result:me.result]||"";
-    const b=document.createElement("button");
+    const b=document.createElement("div");
     b.className="gcard"; b.style.setProperty("--rc",res[1]);
     b.innerHTML=`<span class="gav ${meW?"w":"b"}">${pieceSvg(meW?"w":"b","k","")}</span>
       <span class="gt"><b>${esc(op.username)}<span>${op.rating||""}</span></b>
-      <span class="gm">${esc(TC[g.time_class]||g.time_class||"")} · ${relDate(g.end_time)}${how?" · "+how:""}</span></span>
-      <span class="res">${res[0]}</span>`;
+      <span class="gm"><span class="rt">${res[0]}</span> · ${esc(TC[g.time_class]||g.time_class||"")} · ${relDate(g.end_time)}${how?" · "+how:""}</span></span>
+      <button class="ana" aria-label="Анализ партии против ${esc(op.username)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Анализ</button>`;
     b.onclick=()=>{ $("pgn").value=g.pgn; if(loadPgn(g.pgn)){ closeSheets(); window.scrollTo({top:0,behavior:"smooth"}); } };
     box.appendChild(b);
   }
@@ -1125,7 +1163,9 @@ let lastT=0; document.addEventListener("touchend",e=>{ if(e.target.closest("inpu
 document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 document.addEventListener("gesturestart",e=>e.preventDefault());
 
-$("open").onclick=()=>{ openSheet("sheet"); if($("nick").value.trim()&&!GAMES.length) lookup(); else if(!GAMES.length) $("games").innerHTML=`<div class="empty"><b>Найди свои партии</b>Введи ник на chess.com, и здесь появятся последние партии. Нажми на любую, чтобы разобрать.</div>`; };
+const EXAMPLES=["Hikaru","MagnusCarlsen","GothamChess"];
+$("open").onclick=()=>{ openSheet("sheet"); if($("nick").value.trim()&&!GAMES.length) lookup(); else if(!GAMES.length) $("games").innerHTML=`<div class="empty"><b>Найди партии любого игрока</b>Введи ник на chess.com — появятся последние партии с кнопкой «Анализ».<div class="exn">${EXAMPLES.map(n=>`<button data-ex="${n}">${n}</button>`).join("")}</div></div>`; };
+$("games").addEventListener("click",e=>{ const b=e.target.closest("[data-ex]"); if(!b) return; e.stopPropagation(); $("nick").value=b.dataset.ex; lookup(); });
 $("opts").onclick=()=>openSheet("settings");
 $("close").onclick=closeSheets; $("close2").onclick=closeSheets; $("scrim").onclick=closeSheets;
 $("depth").onchange=e=>{ S.depth=+e.target.value; try{localStorage.setItem("revizor-depth",e.target.value);}catch(_){} };
@@ -1164,6 +1204,8 @@ document.body.classList.add("cg-wrap");
 if(typeof Chess==="undefined"){ setStatus("Не загрузилась шахматная библиотека. Проверь интернет и обнови страницу.",0); return; }
 engineReady=engine.init(); engineReady.catch(()=>{});
 loadPgn(SAMPLE);
+{ const q=new URLSearchParams(location.search), u=(q.get("u")||"").trim(), gid=(q.get("g")||"").trim();
+  if(u&&/^\d{5,}$/.test(gid)){ $("nick").value=u; $("link").value="https://www.chess.com/game/"+gid; openSheet("sheet"); lookup().then(()=>{ $("link").value=""; }); try{ history.replaceState(null,"",location.pathname); }catch(e){} } }
 let wantSet="cb"; try{ wantSet=localStorage.getItem("revizor-pieces")||"cb"; if(localStorage.getItem("revizor-sound")==="0"){SOUND=false;$("sound").checked=false;} }catch(_){}
 $("pieces").value=wantSet; setPieces(wantSet);
 loadLichessBook();

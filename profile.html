@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#262421">
 <style>:root{padding-top:env(safe-area-inset-top,0px)}</style>
 <title>Профиль игрока</title>
+<link rel="icon" href="favicon.svg?v=11092000" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=11092000">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Nunito+Sans:opsz,wght@6..12,600;6..12,700;6..12,800&display=swap">
@@ -112,6 +114,30 @@ a{color:inherit}
 .more{display:block;width:100%;margin-top:10px;padding:11px;border-radius:10px;background:var(--card-2);font-weight:800;color:var(--ink-2)}
 .empty{color:var(--muted);font-weight:700;font-size:14px;padding:8px 0}
 .foot{font-size:12.5px;color:var(--muted);margin:4px 2px 0}
+.who{flex:1;min-width:0}
+.who h1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ava img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.swap{flex:none;background:var(--card-2);border-radius:999px;padding:8px 14px;font-weight:800;font-size:13.5px;color:var(--ink-2)}
+.pfind{display:flex;gap:8px}
+.pfind input{flex:1;min-width:0;background:var(--card-2);border:2px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;font-weight:800;color:#fff;outline:none}
+.pfind input:focus{border-color:var(--green)}
+.pfind .btn{border:0;cursor:pointer;font-size:15px;padding:0 16px}
+.welcome p{margin:0 0 12px;color:var(--ink-2);font-weight:600}
+.welcome p.small{margin:12px 0 0;font-size:13px;color:var(--muted)}
+.sync .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sync b{display:block;font-size:15px}
+.sync small{display:block;color:var(--muted);font-weight:700;font-size:12.5px;margin-top:2px}
+.sbtns{display:flex;gap:8px;flex-wrap:wrap}
+.sbtns button{font-size:13.5px}
+.sbar{height:6px;border-radius:3px;background:var(--bar);overflow:hidden;margin-top:12px}
+.sbar i{display:block;height:100%;width:0;background:var(--green);transition:width .3s}
+.ex{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ex button{background:var(--card-2);border-radius:999px;padding:6px 12px;font-weight:800;font-size:13px;color:var(--ink-2)}
+@media (min-width:1000px){
+  .app{max-width:1080px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:12px}
+  .app>.pinbar,.app>.welcome,.app>.sync,.app>.foot{grid-column:1/-1}
+  #main>section:last-child{grid-column:1/-1}
+}
 .cp{display:block;background-size:cover;background-repeat:no-repeat;background-position:center}
 .cp.cp-wp{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==")}
 .cp.cp-wb{background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiNmZmYiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PC9nPjwvc3ZnPg==")}
@@ -140,15 +166,36 @@ a{color:inherit}
 
 <div class="app">
   <div class="pinbar">
-  <nav class="sitenav" aria-label="Разделы"><a href="https://sw3ptop.github.io/chess-revizor/index.html?v=11081311"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Разбор</a><a href="https://sw3ptop.github.io/chess-revizor/repertoire.html?v=11081311"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 5.6c2.7-1.2 5.9-1.1 8.7.6v13.4c-2.8-1.6-6-1.7-8.7-.6zM12.8 6.2c2.8-1.7 6-1.8 8.7-.6v13.4c-2.7-1.1-5.9-1-8.7.6z"/></svg>Дебюты</a><a href="https://sw3ptop.github.io/chess-revizor/profile.html?v=11081311" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Профиль</a></nav>
+  <nav class="sitenav" aria-label="Разделы"><a href="https://sw3ptop.github.io/chess-revizor/index.html?v=11092000"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Разбор</a><a href="https://sw3ptop.github.io/chess-revizor/repertoire.html?v=11092000"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 5.6c2.7-1.2 5.9-1.1 8.7.6v13.4c-2.8-1.6-6-1.7-8.7-.6zM12.8 6.2c2.8-1.7 6-1.8 8.7-.6v13.4c-2.7-1.1-5.9-1-8.7.6z"/></svg>Дебюты</a><a href="https://sw3ptop.github.io/chess-revizor/profile.html?v=11092000" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Профиль</a></nav>
   <header class="top">
     <div class="hdr">
-      <div class="ava"><i class="cp cp-wn"></i></div>
-      <div><h1 id="pName">Профиль</h1><small id="pSub">Загружаю…</small></div>
+      <div class="ava" id="ava"><i class="cp cp-wn"></i></div>
+      <div class="who"><h1 id="pName">Профиль</h1><small id="pSub">Загружаю…</small></div>
+      <button class="swap" id="swap" hidden>Сменить</button>
     </div>
+    <form class="pfind" id="pfind" autocomplete="off" hidden>
+      <input type="text" id="pnick" placeholder="Ник на chess.com" aria-label="Ник на chess.com" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
+      <button type="submit" class="btn">Открыть</button>
+    </form>
   </header>
   </div>
 
+  <section class="card welcome" id="welcome" hidden>
+    <h2>Чей профиль открыть?</h2>
+    <p>Введи ник на chess.com. Я скачаю последние партии, разберу каждую движком и покажу точность, частые ошибки и дебюты.</p>
+    <form class="pfind" id="wfind" autocomplete="off">
+      <input type="text" id="wnick" placeholder="Ник на chess.com" aria-label="Ник на chess.com" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go">
+      <button type="submit" class="btn">Открыть</button>
+    </form>
+    <p class="small">Анализ идёт прямо в браузере: 20 партий — примерно 1–3 минуты. Результаты сохраняются на этом устройстве.</p>
+  </section>
+
+  <section class="card sync" id="sync" hidden>
+    <div class="srow"><div><b id="syncT">Готовлюсь…</b><small id="syncS"></small></div><div class="sbtns" id="syncB"></div></div>
+    <div class="sbar" id="sbarw"><i id="sbar"></i></div>
+  </section>
+
+  <div id="main" style="display:contents">
   <section class="card">
     <div class="hero">
       <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#403E3B" stroke-width="12"/><circle id="ringArc" cx="60" cy="60" r="52" fill="none" stroke="#81B64C" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 400"/></svg>
@@ -195,10 +242,13 @@ a{color:inherit}
     <div class="games" id="games"></div>
     <button class="more" id="more" hidden>Показать ещё</button>
   </section>
+  </div>
   <p class="foot" id="foot"></p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="core.js?v=11092000"></script>
+<script src="player.js?v=11092000"></script>
 <script>
 (function(){
 "use strict";
@@ -214,22 +264,23 @@ const KIND={
   mate_missed:{t:"Не видишь мат",c:"var(--amber)",tip:"У тебя был мат, а ты его не нашёл. Ищи шахи первыми, особенно когда король соперника зажат."},
   position:{t:"Позиционные ошибки",c:"var(--blue)",tip:"Материал цел, но позиция стала хуже: фигура ушла на плохое поле или открылся король."}
 };
-let P=null, filter="", shown=12;
-const cache={};
+let P=null, filter="", shown=12, cache={};
+const RP=window.RevPlayer;
+let ME="", LOCAL=false, CTL=null, DEPTH=12;
 async function getJSON(u){ const r=await fetch(u,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); return r.json(); }
 
 function ring(v){ const c=2*Math.PI*52; $("ringArc").setAttribute("stroke-dasharray",`${(v/100*c).toFixed(1)} ${c.toFixed(1)}`); }
 function renderTop(){
   const t=P.total, last=P.games[0];
-  $("pName").textContent=P.player;
-  $("pSub").textContent=`${last&&last.myElo?`Рейтинг ${last.myElo} · `:""}обновлено ${new Date(P.updated).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}`;
+  $("pName").textContent=ME||P.player;
+  $("pSub").textContent=`${last&&last.myElo?`Рейтинг ${last.myElo} · `:""}${LOCAL?"разобрано на этом устройстве":"обновлено "+new Date(P.updated).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}`;
   $("accAll").textContent=t.acc??"—"; ring(t.acc||0);
   $("kGames").textContent=t.n;
   $("kScore").innerHTML=`<span class="up">${t.win}</span> · ${t.draw} · <span class="down">${t.loss}</span>`;
   const d=(P.recent.acc||0)-(t.acc||0);
   $("kRecent").innerHTML=`${P.recent.acc??"—"} <small class="${d>=0?"up":"down"}" style="font-size:13px">${d>=0?"▲":"▼"}${Math.abs(d).toFixed(1)}</small>`;
   $("kBl").textContent=P.blundersPerGame;
-  $("foot").textContent=`Каждая партия разобрана движком Stockfish. Данные обновляются автоматически после новых партий на chess.com. Фигуры: Colin M.L. Burnett, CC BY-SA 3.0.`;
+  $("foot").textContent=LOCAL?`Партии разобраны движком Stockfish прямо в этом браузере и хранятся на этом устройстве. Новые партии с chess.com подтягиваются, когда открываешь профиль. Фигуры: Colin M.L. Burnett, CC BY-SA 3.0.`:`Каждая партия разобрана движком Stockfish на сервере. Данные обновляются автоматически после новых партий на chess.com. Фигуры: Colin M.L. Burnett, CC BY-SA 3.0.`;
 }
 function renderChart(){
   const svg=$("chart"), W=svg.clientWidth||600, H=150, pad={l:28,r:8,t:8,b:18};
@@ -305,7 +356,7 @@ function mistakeHtml(g,m){
 function gameDetail(g){
   const ms=g.mistakes.slice().sort((a,b)=>b.loss-a.loss);
   const top=ms.slice(0,5).sort((a,b)=>a.ply-b.ply), rest=ms.slice(5).sort((a,b)=>a.ply-b.ply);
-  const head=`<div class="links"><a class="btn ghost" href="${esc(g.url)}" target="_blank" rel="noopener">Открыть на chess.com</a></div>
+  const head=`<div class="links"><a class="btn" href="index.html?u=${encodeURIComponent(ME||"")}&g=${encodeURIComponent(g.id)}">Разобрать по ходам</a><a class="btn ghost" href="${esc(g.url)}" target="_blank" rel="noopener">Открыть на chess.com</a></div>
     <svg class="curve" role="img" aria-label="Оценка по ходу партии"></svg>
     <p style="margin:0;color:var(--ink-2);font-weight:700;font-size:13.5px">Точность: ты ${g.acc} · соперник ${g.accOpp}. ${g.cls.blunder?`Зевков: ${g.cls.blunder}. `:""}${g.cls.mistake?`Ошибок: ${g.cls.mistake}. `:""}${g.cls.best?`Лучших ходов: ${g.cls.best}.`:""}${ms.length>5?` Ниже — 5 самых дорогих ошибок.`:""}</p>`;
   if(!ms.length) return head+`<p class="empty">Крупных ошибок нет. Отличная партия!</p>`;
@@ -314,11 +365,85 @@ function gameDetail(g){
 let rz; window.addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>P&&renderChart(),150); });
 let lastT=0; document.addEventListener("touchend",e=>{ if(e.target.closest("input,select,textarea,label,summary")) return; const n=Date.now(); if(n-lastT<350){ e.preventDefault(); const t=e.target.closest("button,a"); if(t) t.click(); } lastT=n; },{passive:false});
 
-(async()=>{
-  try{ P=await getJSON("data/profile.json"); }
-  catch(e){ P=SNAP&&SNAP.profile; }
-  if(!P){ $("pSub").textContent="Данных пока нет: анализ ещё не запускался."; return; }
+function renderAll(){
+  const has=P&&P.total&&P.total.n>0;
+  $("main").hidden=!has;
+  if(!has){ $("pName").textContent=ME; return; }
   renderTop(); renderChart(); renderFix(); renderTables(); renderGames();
+}
+function showWelcome(){
+  if(CTL){ CTL.stop(); CTL=null; }
+  ME=""; $("welcome").hidden=false; $("main").hidden=true; $("sync").hidden=true; $("swap").hidden=true; $("pfind").hidden=true;
+  $("pName").textContent="Профиль"; $("pSub").textContent="Точность, ошибки и дебюты любого игрока chess.com";
+  setAva(null); setTimeout(()=>$("wnick").focus(),50);
+}
+function setAva(url){ const a=$("ava"); a.innerHTML=url?`<img src="${esc(url)}" alt="" referrerpolicy="no-referrer">`:`<i class="cp cp-wn"></i>`; const im=a.querySelector("img"); if(im) im.onerror=()=>setAva(null); }
+function setSync(t,s,frac,btns){
+  $("sync").hidden=false; $("syncT").textContent=t; $("syncS").textContent=s||"";
+  $("sbarw").hidden=frac==null; $("sbar").style.width=Math.round((frac||0)*100)+"%";
+  $("syncB").innerHTML=(btns||[]).map(([id,txt,ghost])=>`<button class="btn${ghost?" ghost":""}" data-a="${id}">${txt}</button>`).join("");
+}
+const nGames=n=>`${n} ${n%10===1&&n%100!==11?"партию":(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20))?"партии":"партий"}`;
+function idleSync(msg){
+  const n=Object.keys(RP.load(ME).games).length;
+  setSync(msg||(n?`Разобрано ${nGames(n).replace("партию","партия")}`:"Партии ещё не разобраны"),n?"Можно добавить более старые партии — профиль станет точнее.":"",null,[["more",n?"Разобрать ещё 20":"Разобрать 20 партий"],["fresh","Проверить новые",true]]);
+}
+function runSync(limit){
+  if(CTL) CTL.stop();
+  const who=ME; let lastDraw=0;
+  setSync("Ищу партии на chess.com…","",0,[["stop","Стоп",true]]);
+  CTL=RP.sync(who,{limit,depth:DEPTH,onProgress:p=>{
+    if(who!==ME) return;
+    if(p.phase==="engine") setSync("Запускаю движок…",`${nGames(p.total)} к разбору`,0,[["stop","Стоп",true]]);
+    else if(p.phase==="game"){
+      $("syncT").textContent=`Разбираю партии: ${p.done} из ${p.total}`;
+      $("syncS").textContent=`Движков параллельно: ${RP.workers()} · глубина ${DEPTH} · не закрывай вкладку`;
+      $("sbar").style.width=Math.round(p.frac*100)+"%";
+      if(p.game&&Date.now()-lastDraw>400){ lastDraw=Date.now(); P=RP.profile(who); cache=RP.load(who).games; renderAll(); }
+    }
+  }});
+  const ctl=CTL;
+  ctl.done.then(r=>{
+    if(ctl!==CTL||who!==ME) return; CTL=null;
+    P=RP.profile(who); cache=RP.load(who).games; renderAll();
+    if(r.error==="notfound"){ $("pSub").textContent="Такого игрока нет на chess.com"; setSync(`Игрок «${who}» не найден на chess.com`,"Проверь ник.",null,[["swap","Ввести другой ник"]]); return; }
+    if(r.error==="net"){ setSync("Не удалось связаться с chess.com","Проверь интернет. Внутри Claude сеть закрыта — открой сайт на GitHub Pages.",null,[["fresh","Повторить"]]); return; }
+    if(r.error==="engine"){ setSync("Не запустился движок",r.message||"",null,[["fresh","Повторить"]]); return; }
+    if(r.stopped){ idleSync("Остановлено"); return; }
+    idleSync(r.added?`Готово: +${nGames(r.added)}`:"Новых партий нет");
+  });
+}
+$("sync").addEventListener("click",e=>{ const b=e.target.closest("[data-a]"); if(!b) return; const a=b.dataset.a;
+  if(a==="stop"&&CTL){ CTL.stop(); } else if(a==="more") runSync(20); else if(a==="fresh") runSync(20); else if(a==="swap") $("swap").click(); });
+async function openPlayer(nick){
+  nick=String(nick||"").trim(); if(!nick) return showWelcome();
+  if(CTL){ CTL.stop(); CTL=null; }
+  ME=nick; RP.setMe(nick); LOCAL=!RP.isServer(nick); P=null; cache={}; filter=""; shown=12;
+  try{ history.replaceState(null,"","?u="+encodeURIComponent(nick)+location.hash); }catch(e){}
+  $("welcome").hidden=true; $("pfind").hidden=true; $("swap").hidden=false; $("sync").hidden=true;
+  $("pName").textContent=nick; $("pSub").textContent="Загружаю…"; setAva(null);
+  document.querySelectorAll("#filters .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.f===""));
+  RP.player(nick).then(i=>{ if(ME===nick&&i&&i.avatar) setAva(i.avatar); }).catch(()=>{});
+  if(!LOCAL){
+    try{ P=await getJSON(RP.SERVER[RP.norm(nick)]+"profile.json"); }
+    catch(e){ P=SNAP&&SNAP.profile; }
+    if(ME!==nick) return;
+    if(!P){ $("pSub").textContent="Данных пока нет: анализ ещё не запускался."; $("main").hidden=true; return; }
+    renderAll(); return;
+  }
+  const lib=RP.load(nick);
+  P=RP.profile(nick); cache=lib.games; renderAll();
+  if(!P.total.n) $("pSub").textContent="Сейчас разберу последние партии";
+  runSync(20);
+}
+$("swap").onclick=()=>{ const f=$("pfind"); f.hidden=!f.hidden; if(!f.hidden){ $("pnick").value=""; $("pnick").focus(); } };
+$("pfind").addEventListener("submit",e=>{ e.preventDefault(); const v=$("pnick").value.trim(); if(v){ $("pnick").blur(); openPlayer(v); } });
+$("wfind").addEventListener("submit",e=>{ e.preventDefault(); const v=$("wnick").value.trim(); if(v){ $("wnick").blur(); openPlayer(v); } });
+
+(async()=>{
+  if(SNAP&&!window.RevPlayer){ P=SNAP.profile; ME=P.player; renderAll(); return; }
+  const me=RP.getMe();
+  if(me) openPlayer(me); else showWelcome();
 })();
 })();
 </script>
