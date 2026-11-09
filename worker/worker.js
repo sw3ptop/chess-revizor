@@ -272,9 +272,37 @@ function buildPuzzles(all) {
   return out;
 }
 
+function writeSummary() {
+  const all = fs.readdirSync(GAMES).filter(f => f.endsWith(".json")).map(f => { try { return JSON.parse(fs.readFileSync(path.join(GAMES, f), "utf8")); } catch (e) { return null; } }).filter(Boolean);
+  fs.writeFileSync(path.join(DATA, "profile.json"), JSON.stringify(buildProfile(all)));
+  fs.writeFileSync(path.join(DATA, "puzzles.json"), JSON.stringify(buildPuzzles(all)));
+  return all.length;
+}
+
+/* ------------------------------------------------------------------ git */
+const sh = c => execSync(c, { cwd: ROOT, stdio: ["ignore", "pipe", "pipe"] }).toString().trim();
+function publish(msg) {
+  if (NO_PUSH) return true;
+  try {
+    sh("git add -A data");
+    if (sh("git status --porcelain data")) sh(`git -c user.name="chess-scout" -c user.email="scout@localhost" commit -q -m "${msg}"`);
+    sh("git pull -q --rebase -X theirs origin main");
+    if (sh("git rev-list --count origin/main..HEAD") !== "0") { sh("git push -q origin main"); log("выложено на сайт"); }
+    return true;
+  } catch (e) {
+    const err = (e.stderr ? e.stderr.toString() : e.message).trim().split("\n").slice(-3).join(" | ");
+    log("git: " + err);
+    if (/read only|denied|Permission/i.test(err)) log("ключ без права записи: в GitHub → Settings → Deploy keys включи «Allow write access»");
+    try { sh("git rebase --abort"); } catch (_) {}
+    return false;
+  }
+}
+
 /* ------------------------------------------------------------------ main */
 (async () => {
   fs.mkdirSync(GAMES, { recursive: true });
+  // push anything left from an earlier run (e.g. a failed push), and pick up site updates
+  if (!NO_PUSH) publish("Анализ партий");
   const done = new Set(fs.readdirSync(GAMES).filter(f => f.endsWith(".json")).map(f => f.slice(0, -5)));
   const fresh = PGN_FILES.length ? readPgnFiles(PGN_FILES, done) : await fetchGames(done);
   log(`новых партий: ${fresh.length}`);
@@ -282,22 +310,16 @@ function buildPuzzles(all) {
     const eng = new Engine(); await eng.start();
     for (const [i, g] of fresh.entries()) {
       const t0 = Date.now();
-      const a = await analyseGame(eng, g);
-      if (a) { fs.writeFileSync(path.join(GAMES, g.id + ".json"), JSON.stringify(a)); log(`${i + 1}/${fresh.length} ${a.date} против ${a.opp}: точность ${a.acc}, ошибок ${a.mistakes.length} (${((Date.now() - t0) / 1000).toFixed(0)} с)`); }
+      try {
+        const a = await analyseGame(eng, g);
+        if (a) { fs.writeFileSync(path.join(GAMES, g.id + ".json"), JSON.stringify(a)); log(`${i + 1}/${fresh.length} ${a.date} против ${a.opp}: точность ${a.acc}, ошибок ${a.mistakes.length} (${((Date.now() - t0) / 1000).toFixed(0)} с)`); }
+      } catch (e) { log(`${i + 1}/${fresh.length} партия ${g.id} пропущена: ${e.message}`); }
+      if ((i + 1) % 15 === 0 && i + 1 < fresh.length) { writeSummary(); publish(`Анализ партий: ${i + 1} из ${fresh.length}`); }
     }
     eng.stop();
   }
-  const all = fs.readdirSync(GAMES).filter(f => f.endsWith(".json")).map(f => JSON.parse(fs.readFileSync(path.join(GAMES, f), "utf8")));
-  fs.writeFileSync(path.join(DATA, "profile.json"), JSON.stringify(buildProfile(all)));
-  fs.writeFileSync(path.join(DATA, "puzzles.json"), JSON.stringify(buildPuzzles(all)));
-  log(`профиль: ${all.length} партий`);
-  if (fresh.length && !NO_PUSH) {
-    try {
-      execSync("git add data", { cwd: ROOT });
-      execSync(`git -c user.name="chess-scout" -c user.email="scout@localhost" commit -q -m "Анализ партий: +${fresh.length}"`, { cwd: ROOT });
-      execSync("git pull -q --rebase origin main && git push -q origin main", { cwd: ROOT });
-      log("выложено на сайт");
-    } catch (e) { log("git: " + e.message.split("\n")[0]); process.exitCode = 1; }
-  }
+  const n = writeSummary();
+  log(`профиль: ${n} партий`);
+  if (!publish(`Анализ партий: +${fresh.length}`)) process.exitCode = 1;
   process.exit();
 })().catch(e => { log("ошибка: " + e.message); process.exit(1); });
