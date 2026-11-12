@@ -88,14 +88,18 @@
       });
     }
     send(c) { this.w.postMessage(c); }
-    analyse(fen, depth) {
-      return new Promise((res, rej) => {
+    analyse(fen, depth) { return this.go(fen, "go depth " + depth); }
+    // one search with any "go …" command (e.g. "go depth 12 searchmoves e2e4"); one search at a time
+    go(fen, cmd) {
+      const job = (this.q || Promise.resolve()).then(() => new Promise((res, rej) => {
         const L = {};
         this.fail = rej;
         this.h = l => { if (core().uciLine(L, l)) { this.h = null; this.fail = null; res(L); } };
         this.send("position fen " + fen);
-        this.send("go depth " + depth);
-      });
+        this.send(cmd);
+      }));
+      this.q = job.catch(() => {});
+      return job;
     }
     kill() { try { this.w.terminate(); } catch (e) {} if (this.fail) this.fail(new Error("stopped")); }
   }
@@ -151,5 +155,5 @@
     return { stop() { stopped = true; engines.forEach(x => x.kill()); }, done };
   }
 
-  window.RevPlayer = { SERVER, norm, getMe, setMe, isServer, load, save, forget, games, profile, puzzles, player, fetchList, sync, workers };
+  window.RevPlayer = { Engine, SERVER, norm, getMe, setMe, isServer, load, save, forget, games, profile, puzzles, player, fetchList, sync, workers };
 })();
